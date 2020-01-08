@@ -6,13 +6,6 @@
 #include "History.h"
 
 
-
-typedef struct node{
-    int row,col;
-    struct node* next;
-    struct node* prev;
-}Node;
-
 Node* create_node(int row, int col){
 Node *temp= (Node *) malloc(sizeof(Node));
 temp->row=row;

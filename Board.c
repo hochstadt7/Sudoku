@@ -4,18 +4,22 @@
 #include "MainAux.h"
 
 
-Board* create_board(int **arr, int**fixed, int**solution,int **error,int dimension,int row_per_block,int col_per_block){
+Board* create_board(int dimension,int row_per_block,int col_per_block){
 Board* board=(Board*) malloc(sizeof(Board));
-if(!board)
+if(!board) {
+    printf("create_board failed");
     return NULL;
+}
 board->arr=first_init(dimension);
 if(board->arr==NULL) {
+    printf("create_board failed");
     free(board);
     return NULL;
 }
 board->fixed=first_init(dimension);
 if(board->fixed==NULL)
 {
+    printf("create_board failed");
     free(board->arr);
     free(board);
     return  NULL;
@@ -23,6 +27,7 @@ if(board->fixed==NULL)
 board->solution=first_init(dimension);
     if(board->solution==NULL)
     {
+        printf("create_board failed");
         free(board->fixed);
         free(board->arr);
         free(board);
@@ -31,12 +36,14 @@ board->solution=first_init(dimension);
     board->error=first_init(dimension);
     if(board->error==NULL)
     {
+        printf("create_board failed");
         free(board->error);
         free(board->fixed);
         free(board->arr);
         free(board);
         return NULL;
     }
+    board->dimension=dimension;
 board->row_per_block=row_per_block;
 board->col_per_block=col_per_block;
 board->mode=Init;

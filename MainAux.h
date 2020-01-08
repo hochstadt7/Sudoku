@@ -7,4 +7,5 @@
 
 int** first_init(int dimension);
 
+
 #endif //BIGPROJECT_MAINAUX_H

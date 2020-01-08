@@ -11,6 +11,6 @@ typedef struct board{
     enum status mode;
 
 }Board;
-Board* create_board(int **arr, int**fixed, int**solution,int **error,int dimension,int row_per_block,int col_per_block);
+Board* create_board(int dimension,int row_per_block,int col_per_block);
 void print_board(Board* board);
 #endif //BIGPROJECT_BOARD_H
