@@ -19,7 +19,19 @@ int** first_init(int dimension) {
         }
     }
     return arr;
-
 }
+
+void copy_arrays(int **copy, int**paste,int dimension)
+{
+    int index_row,index_col;
+    for(index_row=0; index_row<dimension; index_row++){
+        for(index_col=0; index_col<dimension; index_col++)
+        {
+            paste[index_row][index_col]=copy[index_row][index_col];
+        }
+    }
+}
+
+
 
 
