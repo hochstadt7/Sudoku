@@ -28,7 +28,6 @@ void print_me(int **arr,int dimension)
 int main() {
 
 Board *game=load("C:\\Users\\LENOVO\\Documents\\New folder\\type");
-set(game->arr,game->dimension,game->fixed,1,9,7,game->row_per_block,game->col_per_block);
 print_board(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block);
     return 0;
 }
