@@ -6,12 +6,16 @@
 #include "History.h"
 
 
-List *create_list(){
-List *tmp=(List *)malloc(sizeof(List));
-tmp->head=NULL;tmp->curr=NULL;
-return tmp;
+List *create_list() {
+    List *tmp = (List *) malloc(sizeof(List));
+    if(tmp==NULL){
+        printf("List allocation failed");
+        return NULL;
+    }
+    tmp->head = NULL;
+    tmp->curr = NULL;
+    return tmp;
 }
-
 Node* create_node(int row, int col,int val){
 Node *temp= (Node *) malloc(sizeof(Node));
 if(temp==NULL) {
@@ -43,22 +47,24 @@ else{
 
 void undo(List* lst,Board *board){
     if(lst->head==NULL||lst->curr->prev==NULL){
-        printf("Cant undo");
+        printf("Can't undo");
         return;
     } else{
         lst->curr=lst->curr->prev;
         board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
+    print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
 }
 
 void redo(List* lst,Board *board){
     if(lst->head==NULL||lst->curr->next==NULL){
-        printf("Cant redo");
+        printf("Can't redo");
         return;
     } else{
         lst->curr=lst->curr->next;
         board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
+    print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
 }
 
 void reset_list(List *lst,Board *board){
@@ -71,6 +77,7 @@ void reset_list(List *lst,Board *board){
         lst->curr=lst->curr->prev;
         board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
+    print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
 }
 
 void free_lst(List *lst){
@@ -88,10 +95,10 @@ void free_lst(List *lst){
     free(lst->curr);
     free(lst);
 }
-void print_list(List *lst){
-    Node* tmp=lst->head;
-    while (tmp!=NULL){
-        printf("row=%d col=%d\n",tmp->row,tmp->col);
-        tmp=tmp->next;
+    void print_list(List *lst) {
+        Node *tmp = lst->head;
+        while (tmp != NULL) {
+            printf("row=%d col=%d\n", tmp->row, tmp->col);
+            tmp = tmp->next;
+        }
     }
-}

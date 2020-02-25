@@ -63,8 +63,11 @@ Board* load(char *link) {
     }
     /*read content of board*/
     for (loop = 0; loop < dimension; loop++) {
-        fgets(input, 125, dest);
-        num = strtok(input, DELIMITER);
+
+        do {
+            fgets(input, 125, dest);
+            num= strtok(input, DELIMITER);
+        }while(num==NULL&&!feof(dest));
         for (index = 0; index < dimension; index++) {
 
             if (num == NULL)//too short input, the excepted length is dimension
@@ -86,10 +89,13 @@ Board* load(char *link) {
             return un_format(dest);
         }
     }
-
-    if(fgets(input, 125, dest)!=NULL)// too many rows
-    {
-        return un_format(dest);
+    if(!feof(dest)) {// still not finish reading, might be illegal
+        do {
+            fgets(input, 125, dest);
+            num = strtok(input, DELIMITER);
+        } while (num == NULL && !feof(dest));
+        if (num != NULL)
+            return un_format(dest);
     }
     fclose(dest);
     return new;

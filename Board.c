@@ -63,7 +63,7 @@ void destroy_board(Board* board){
 void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
     int index_row, index_col, index_block, blocks_per_row,num_dash;
     blocks_per_row = dimension / col_per_block;
-    num_dash=4*dimension+col_per_block+1;
+    num_dash=blocks_per_row*4*col_per_block+1;
     for (index_row = 0; index_row < dimension; index_row++) {
         if (index_row % row_per_block == 0) {
             for(index_block=0; index_block<num_dash; index_block++) {
@@ -82,7 +82,7 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
                     printf(" %2d*", arr[index_row][index_col + col_per_block * index_block]);
                     }
                     else
-                        printf(" %2d ", arr[index_row][index_col + col_per_block * index_block]);
+                        printf("%2d ", arr[index_row][index_col + col_per_block * index_block]);
                 } else {
                     printf("   ");
                 }
