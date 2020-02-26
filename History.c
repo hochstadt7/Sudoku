@@ -53,7 +53,8 @@ void undo(List* lst,Board *board){
         lst->curr=lst->curr->prev;
         board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
-    print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
+    //print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
+    printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
 }
 
 void redo(List* lst,Board *board){
@@ -65,6 +66,7 @@ void redo(List* lst,Board *board){
         board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
     print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
+    printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
 }
 
 void reset_list(List *lst,Board *board){

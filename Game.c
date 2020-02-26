@@ -15,6 +15,12 @@ void hint(int **solution, int y, int x) {
 
 
 void save(char *link,Board *board){
+    //check if board is erroneous, and in edit mode or not solvable (need to add not solvable condition after implemnting ilp)
+    if(board->mode==Edit&&is_errorneous(board->error,board->dimension))
+    {
+        printf("In edit mode errorneous boards may not be saved.\n");
+        return;
+    }
 FILE *dest=NULL;
 dest=fopen(link,"w");
 if(dest==NULL)
@@ -51,6 +57,7 @@ void set(int **arr,int **error, int dimension, int **fixed, int y, int x, int z,
         fix_error(arr,error,dimension,x,y,0,x - x % row_per_block, y - y % col_per_block,row_per_block,col_per_block);
         arr[x][y] = 0;
         add(lst,x,y,z);
+        print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
         return;
     }
 //change condition here,error value is ok
@@ -58,6 +65,7 @@ void set(int **arr,int **error, int dimension, int **fixed, int y, int x, int z,
         arr[x][y] = z;
         fix_error(arr,error,dimension,x,y,z,x - x % row_per_block, y - y % col_per_block,row_per_block,col_per_block);
         add(lst,x,y,z);
+        print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
     } else {
         printf("Error: value is invalid\n");
         return;
@@ -65,7 +73,7 @@ void set(int **arr,int **error, int dimension, int **fixed, int y, int x, int z,
 }
 
 void mark_errors(int mark,Board *board){
-board->mark_error=1;
+board->mark_error=mark;
 }
 
 void edit(char *link,Board *board){
@@ -73,9 +81,13 @@ board->mode=Edit;
 load(link);
 }
 
-void autofill(int **arr,int dimension,int row_per_block,int col_per_block){
+void autofill(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block, List *lst){
     int row, col,num,count,candidate=0;
     int **temp=first_init(dimension);
+    if(is_errorneous(error,dimension)){
+        printf("Can't autofill errorneous board.\n");
+        return;
+    }
     copy_arrays(arr,temp,dimension);
     for(row=0; row<dimension; row++){
         for(col=0; col<dimension; col++){
@@ -95,12 +107,16 @@ void autofill(int **arr,int dimension,int row_per_block,int col_per_block){
     }
     for(row=0; row<dimension; row++){
         for(col=0; col<dimension; col++) {
-            if(temp[row][col]!=0)
-                arr[row][col]=temp[row][col];//add to memory?
+            if(temp[row][col]!=0) {
+                candidate=temp[row][col];
+                arr[row][col] = candidate;//add to memory?
+                fix_error(arr,error,dimension,row,col,candidate,row - row % row_per_block, col - col % col_per_block,row_per_block,col_per_block);
+                add(lst,row,col,candidate);
+            }
         }
     }
     free(temp);
-
+    print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
 }
 
 

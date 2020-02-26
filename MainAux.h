@@ -7,5 +7,6 @@
 
 int** first_init(int dimension);/*initialize board*/
 void copy_arrays(int **copy, int**paste,int dimension);/*copy data of copy to paste*/
+int is_errorneous(int **error,int dimension);
 
 #endif //BIGPROJECT_MAINAUX_H

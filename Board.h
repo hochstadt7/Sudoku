@@ -13,7 +13,7 @@ enum status {Init=1, Solve=2, Edit=3};
 typedef struct board{
     int **arr, **fixed,**solution,**error;
     int dimension, row_per_block,col_per_block,mark_error,is_over;
-    //List *lst;
+   // List *lst;// need to solve this
     enum status mode;
 
 }Board;

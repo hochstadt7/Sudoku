@@ -1,7 +1,7 @@
 //
 // Created by LENOVO on 08/01/2020.
 //
-
+/* validation of value in row */
 int in_row(const int *arr, int dimension, int value) {
     int index;
     for (index = 0; index < dimension; index++) {
@@ -34,7 +34,7 @@ int in_block(int **arr, int block_start_row, int block_start_col, int value, int
     }
     return 0;
 }
-
+/*check if requested assignment is legal*/
 int is_valid(int **arr, int dimension, int row, int col, int value, int row_per_block, int col_per_block) {
     if (arr[row][col] == value) {
         return 1;
@@ -44,7 +44,7 @@ int is_valid(int **arr, int dimension, int row, int col, int value, int row_per_
     }
     return 1;
 }
-
+/*set errorneous board values*/
 void fix_error(int **arr,int **error,int dimension,int row,int col,int value, int block_start_row, int block_start_col,int row_per_block,int col_per_block){
     int index,add_or_remove;
     add_or_remove=value==0?0:1;
