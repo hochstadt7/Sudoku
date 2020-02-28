@@ -46,17 +46,22 @@ int is_valid(int **arr, int dimension, int row, int col, int value, int row_per_
 }
 /*set errorneous board values*/
 void fix_error(int **arr,int **error,int dimension,int row,int col,int value, int block_start_row, int block_start_col,int row_per_block,int col_per_block){
-    int index,add_or_remove;
+    int index_row,index_col,add_or_remove,is_valid=1;
     add_or_remove=value==0?0:1;
-    for (index = 0; index < dimension; index++) {
-        if (arr[row][index] == arr[row][col]){error[row][index]=add_or_remove;}
-    }
-    for (index = 0; index < dimension; index++) {
-        if (arr[index][col] == arr[row][col]){error[row][index]=add_or_remove;}
-    }
-    for (row = 0; row < row_per_block; row++) {
-        for (col = 0; col < col_per_block; col++) {
-            if (arr[row + block_start_row][col + block_start_col] == arr[row][col]){error[row][index]=add_or_remove;}
+
+        for (index_col = 0; index_col < dimension; index_col++) {
+            if (arr[row][index_col] == arr[row][col] && col != index_col) { error[row][index_col] = add_or_remove; is_valid=0;}
         }
-    }
+        for (index_row = 0; index_row < dimension; index_row++) {
+            if (arr[index_row][col] == arr[row][col]&&row!=index_row) { error[index_row][col] = add_or_remove; is_valid=0; }
+        }
+        for (index_row = 0; index_row < row_per_block; index_row++) {
+            for (index_col = 0; index_col < col_per_block; index_col++) {
+                if (arr[index_row + block_start_row][index_col + block_start_col] == arr[row][col]&&(!(col==index_col+block_start_col&&row==index_row+block_start_row))) {
+                    error[index_row + block_start_row][index_col + block_start_col] = add_or_remove; is_valid=0;
+                }
+            }
+        }
+        if(add_or_remove&&!is_valid)// if we added errorneous
+            error[row][col]=1;
 }

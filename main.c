@@ -28,8 +28,9 @@ void print_me(int **arr,int dimension)
 int main() {
 Board *game=load("C:\\Users\\LENOVO\\Documents\\New folder\\type");
 print_board(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block);
+set(game->arr,game->error,game->dimension,game->fixed,3,0,4,game->row_per_block,game->col_per_block,game->lst);
 
-printf("%d",deter_solve(game->arr,game->dimension,game->row_per_block,game->col_per_block));
-print_board(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block);
+autofill(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block,game->lst);
+print_list(game->lst);
     return 0;
 }

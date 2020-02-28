@@ -55,29 +55,35 @@ void save(char *link,Board *board) {
 
     void set(int **arr, int **error, int dimension, int **fixed, int y, int x, int z, int row_per_block, int col_per_block,
         List *lst) {
+        if(arr[x][y]==z){//if setting to same value before
+            print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
+            return;
+        }
         if (fixed[x][y] == 1) {// can change in edit mode?
             printf("Error: cell is fixed\n");
             return;
         }
+
         if (z == 0) {
             fix_error(arr, error, dimension, x, y, 0, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
+            add(lst, x, y, arr[x][y]);
             arr[x][y] = 0;
-            add(lst, x, y, z);
             print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
             return;
         }
 //change condition here,error value is ok
-        if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
-            arr[x][y] = z;
+      //  if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
+    add(lst, x, y, arr[x][y]);
+    arr[x][y] = z;
             fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
-            add(lst, x, y, z);
             print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
-        } else {
+        //}
+        /*else {
             printf("Error: value is invalid\n");
             return;
-        }
+        }*/
     }
 
     void mark_errors(int mark, Board *board) {
@@ -96,7 +102,7 @@ void save(char *link,Board *board) {
             printf("Can't autofill errorneous board.\n");
             return;
         }
-        copy_arrays(arr, temp, dimension);
+        //copy_arrays(arr, temp, dimension);
         for (row = 0; row < dimension; row++) {
             for (col = 0; col < dimension; col++) {
                 if (arr[row][col] == 0) {
@@ -117,13 +123,13 @@ void save(char *link,Board *board) {
             for (col = 0; col < dimension; col++) {
                 if (temp[row][col] != 0) {
                     candidate = temp[row][col];
+                    add(lst, row, col, arr[row][col]);
                     arr[row][col] = candidate;//add to memory?
                     fix_error(arr, error, dimension, row, col, candidate, row - row % row_per_block,
                               col - col % col_per_block, row_per_block, col_per_block);
-                    add(lst, row, col, candidate);
                 }
             }
         }
-        free(temp);
+        free(temp);//need to free array by array?
         print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
     }
