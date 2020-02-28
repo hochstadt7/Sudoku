@@ -2,7 +2,28 @@
 #include <stdlib.h>
 #include "Board.h"
 #include <string.h>
+#include "ValidBoard.h"
+#include "MainAux.h"
 #define DELIMITER " \t\r\n"
+
+/*check wether fixed cells are legal in solve mode*/
+int fixed_are_valid(int **arr,int **fixed,int dimension,int row_per_block,int col_per_block){
+    int row,col;
+    int **temp=first_init(dimension);
+for(row=0; row<dimension; row++){
+    for(col=0; col<dimension; col++){
+    if(fixed[row][col]==1){
+        if(!is_valid(temp,dimension,row,col,arr[row][col],row_per_block,col_per_block)){
+            printf("Fixed cells are not legal in solve mode");
+            return 0;
+        }
+        temp[row][col]=arr[row][col];
+    }
+    }
+}
+free(temp);
+    return 1;
+}
 
 Board* un_format(FILE *dest){
     printf("File isn't in correct form\n");
@@ -12,7 +33,7 @@ Board* un_format(FILE *dest){
 
 int is_ok(const char *fix){//fixed=2 not fixed=1 not legal=0
     int index=1,fixed=0;
-    if(!('0'<=fix[0]&&fix[0]<='9'))
+    if(!('0'<=fix[0]&&fix[0]<='9'))//not necessery 9
         return  0;
     while (fix[index]!='\0'&&index<3){
         if(fixed==1)
@@ -79,6 +100,8 @@ Board* load(char *link) {
                 return un_format(dest);
             else {
                 is_num=strtol(num,NULL,10);
+                if(is_num>dimension)// too big number
+                    return un_format(dest);
                 new->arr[loop][index]=is_num;
                 if(is_legal==2)//fixed value
                     new->fixed[loop][index]=1;
@@ -98,5 +121,9 @@ Board* load(char *link) {
             return un_format(dest);
     }
     fclose(dest);
+    // need to add conditions:
+    // 1. in solve mode- need to check that fixed cells are legal (code is ready above)
+    if(!fixed_are_valid(new->arr,new->fixed,new->dimension,new->row_per_block,new->col_per_block))
+        return un_format(dest);
     return new;
 }

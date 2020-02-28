@@ -51,7 +51,7 @@ void save(char *link,Board *board) {
     }
 }
 
-/* set square to input value if value is legal*/
+/* set block to input value if value is legal*/
 
     void set(int **arr, int **error, int dimension, int **fixed, int y, int x, int z, int row_per_block, int col_per_block,
         List *lst) {
@@ -90,19 +90,24 @@ void save(char *link,Board *board) {
         board->mark_error = mark;
     }
 
-    void edit(char *link, Board *board) {
-        board->mode = Edit;
-        load(link);
+    Board* edit(char *link,Board *old) {
+        Board *new=load(link);
+        if(new!=NULL){//if edit didnt fail, free current board memory "forget him"
+            if(old!=NULL)
+        destroy_board(old);
+            initialize(new->arr,new->fixed,new->solution,new->error,new->dimension,new->row_per_block,new->col_per_block);
+        }
+        return new;
     }
 
     void autofill(int **arr, int **fixed, int **error, int dimension, int row_per_block, int col_per_block, List *lst) {
         int row, col, num, count, candidate = 0;
-        int **temp = first_init(dimension);
+        int **temp;
         if (is_errorneous(error, dimension)) {
             printf("Can't autofill errorneous board.\n");
             return;
         }
-        //copy_arrays(arr, temp, dimension);
+        temp=first_init(dimension);
         for (row = 0; row < dimension; row++) {
             for (col = 0; col < dimension; col++) {
                 if (arr[row][col] == 0) {
@@ -130,6 +135,6 @@ void save(char *link,Board *board) {
                 }
             }
         }
-        free(temp);//need to free array by array?
+        free_arrays(temp,dimension);
         print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
     }

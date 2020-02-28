@@ -8,5 +8,6 @@
 Board* load(char *link);/*load board game from a file*/
 int is_ok(const char *fix);/*valid input of cell*/
 Board* un_format(FILE *dest);/*error message of loading file failure*/
+void free_arrays(int **arr,int dimension);/*free arrays*/
 
 #endif //BIGPROJECT_FILEMANAGER_H

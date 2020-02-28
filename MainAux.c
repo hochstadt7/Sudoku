@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Board.h"
-
+#include "ValidBoard.h"
 
 int** first_init(int dimension) {
     int i;
@@ -19,6 +19,13 @@ int** first_init(int dimension) {
         }
     }
     return arr;
+}
+
+void free_arrays(int **arr,int dimension){
+    int index;
+    for(index=0; index<dimension; index++) {
+        free(arr[index]);
+    }
 }
 
 void copy_arrays(int **copy, int**paste,int dimension)
@@ -44,6 +51,18 @@ int is_errorneous(int **error,int dimension){
     return 0;
 }
 
+void initialize(int **arr,int **fixed,int **solution,int **error,int dimension, int row_per_block,int col_per_block){
+    int index_row,index_col;
+//find_solution(); find solution using ILP
+for(index_row=0; index_row<dimension; index_row++ ){
+    for(index_col=0; index_col<dimension; index_col++){
+        if(arr[index_row][index_col]!=0) {
+            fix_error(arr, error, dimension, index_row, index_col, arr[index_row][index_col],
+                      index_row - index_row % row_per_block, index_col - index_col % col_per_block, row_per_block,col_per_block);
 
+        }
+        printf("!");
+    }
 
-
+}
+}
