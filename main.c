@@ -11,7 +11,7 @@
 #define COLPERBLOCK 3
 #include "Solve.h"
 #include "Stack.h"
-#include "History.h"
+//#include "History.h"
 
 void print_me(int **arr,int dimension)
 {

@@ -3,10 +3,10 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
-#include "History.h"
+//#include "History.h"
+#include "Board.h"
 
-
-List *create_list() {
+/*List *create_list() {
     List *tmp = (List *) malloc(sizeof(List));
     if(tmp==NULL){
         printf("List allocation failed");
@@ -45,27 +45,27 @@ else{
 }
 }
 
-void undo(List* lst,Board *board){
+void undo(int **arr,List *lst){
     if(lst->head==NULL||lst->curr->prev==NULL){
         printf("Can't undo");
         return;
     } else{
         lst->curr=lst->curr->prev;
-        board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
+        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
     //print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
     printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
 }
 
-void redo(List* lst,Board *board){
+void redo(int **arr,List *lst){
     if(lst->head==NULL||lst->curr->next==NULL){
         printf("Can't redo");
         return;
     } else{
         lst->curr=lst->curr->next;
-        board->arr[lst->curr->row][lst->curr->col]=lst->curr->val;
+        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
-    print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
+    //print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
     printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
 }
 
@@ -103,4 +103,4 @@ void free_lst(List *lst){
             printf("row=%d col=%d\n", tmp->row, tmp->col);
             tmp = tmp->next;
         }
-    }
+    }*/
