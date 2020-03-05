@@ -8,35 +8,14 @@
 #include "ValidBoard.h"
 #include "Stack.h"
 #include "MainAux.h"
-
-/*find next empty block*/
-/*int *find_next_empty(int **arr, int dimension,int row,int col){
-    int i=0,j=0;
-    int *ret=malloc(2* sizeof(int));
-   for(i=row; i<dimension; i++) {
-       for(j=0; j<dimension; j++)
-       {
-           if(!(i==row&&j<=col)) {
-               if (arr[i][j] != 1) {
-                   ret[0] = i;
-                   ret[1] = j;
-                   return ret;
-               }
-           }
-       }
-   }
-   ret[0]=-1;
-   ret[1]=-1;
-    return ret;
-
-}*/
+#include "TestGame.h"
 
 /*count number of possible solutions for the given board*/
 int deter_solve(int **solution, int dimension, int row_per_block, int col_per_block) {
 
     Stack *stk = create_stack();
     Move *up;
-    int  curr_row,curr_col,found_legal,count=0;
+    int  curr_row,curr_col,found_legal,count=0,is_sol=0;
     int **arr=first_init((dimension));//index unfilled blocks
     for(curr_row=0; curr_row<dimension; curr_row++) {
         for (curr_col = 0; curr_col < dimension; curr_col++) {
@@ -45,13 +24,16 @@ int deter_solve(int **solution, int dimension, int row_per_block, int col_per_bl
         }
         }
 
-    push(stk, 0, 0, 0);
+    if(!push(stk, 0, 0, 0))//aloccation failed
+        return 0;
     while (!is_empty(stk)) {
         up = stk->top;
         curr_row=up->row;
         curr_col=up->col;
         found_legal=0;
-        if(arr[curr_row][curr_col]==0) {//if the block is empty
+
+        if(arr[curr_row][curr_col]==0||is_sol==1) {//if the block is empty or we found solution just now
+            is_sol=0;
             while (up->val < dimension) {
                 up->val++;
 
@@ -74,14 +56,26 @@ int deter_solve(int **solution, int dimension, int row_per_block, int col_per_bl
                 {
                     /*free_stack(stk);
                     return 1;*/
+                    print_me(solution,dimension);
+                    printf("\n\n");
                     count++;
+                    if(arr[curr_row][curr_col]==1)
+                    {
+                        do{
+                            pop(stk);
+                        }while (!is_empty(stk)&&arr[stk->top->row][stk->top->col]==1);
+                    } else{
+                      is_sol=1;
+                    }
                 }
                 else{
-                    push(stk, curr_row+1, 0, 0);
+                    if(!push(stk, curr_row+1, 0, 0))
+                        return 0;
                 }
             }
             else{
-                push(stk, curr_row, curr_col+1, 0);
+                if(!push(stk, curr_row, curr_col+1, 0))
+                    return 0;
             }
             }
 

@@ -24,7 +24,7 @@ typedef struct linked_list{
 
 List *create_list();/*create the timeline of moves*/
 Node* create_node();/* create holder for row,column,value*/
-void add(List* lst,int row,int col,int val);/*add last move to the moves timeline*/
+Node* add(List* lst,int row,int col,int val);/*add last move to the moves timeline*/
 void undo(int **arr,List *lst);/*cancel last move*/
 void redo(int **arr,List *lst);/*redo last move*/
 void print_list(List *lst);/*print the list*/

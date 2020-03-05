@@ -1,6 +1,10 @@
 //
 // Created by LENOVO on 08/01/2020.
 //
+
+#include "MainAux.h"
+#include <stdio.h>
+#include <stdlib.h>
 /* validation of value in row */
 int in_row(const int *arr, int dimension, int value) {
     int index;
@@ -64,4 +68,17 @@ void fix_error(int **arr,int **error,int dimension,int row,int col,int value, in
         }
         if(add_or_remove&&!is_valid)// if we added errorneous
             error[row][col]=1;
+}
+
+void validate(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
+    int is_solvable;
+if(is_errorneous(error,dimension))
+{
+    printf("Validation can't be executed because board is errorneous.\n");
+    return;;
+}
+//is_solvable=ILP()
+if(is_solvable)
+    printf("The board was found to be solvable");
+else printf("The board wasn't found to be solvable");
 }

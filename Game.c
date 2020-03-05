@@ -6,9 +6,9 @@
 #include "ValidBoard.h"
 #include "FileManager.h"
 #include "MainAux.h"
-//#include "History.h"
 
-void hint(int **solution, int y, int x) {
+void hint(int **arr,int **fixed,int **solution,int **error,int dimension, int y, int x) {
+    if(is_errorneous(error,dimension)||fixed[x][y]==1||arr[x][y]!=0)// 3 conditions
     printf("Hint: set cell to %d\n", solution[x][y]);
 }
 
@@ -33,11 +33,12 @@ void save(char *link,Board *board) {
                 }
             }
         }
+    }
         fprintf(dest, "%d %d\n", board->row_per_block, board->col_per_block);
 
         for (index_row = 0; index_row < board->dimension; index_row++) {
 
-            for (index_col = 0; index_col < board->dimension; index_col++) {
+            for (index_col = 0; index_col < board->dimension-1; index_col++) {
                 if (board->fixed[index_row][index_col] != 1) {
                     fprintf(dest, "%d ", board->arr[index_row][index_col]);
                 } else {
@@ -45,10 +46,16 @@ void save(char *link,Board *board) {
                 }
 
             }
-            fprintf(dest, "\n");
+            if (board->fixed[index_row][board->dimension-1] != 1) {
+                fprintf(dest, "%d", board->arr[index_row][board->dimension-1]);
+            } else {
+                fprintf(dest, "%d.", board->arr[index_row][board->dimension-1]);
+            }
+            fprintf(dest, "\n");//validate it is nessecery last iteration
+
         }
         fclose(dest);
-    }
+
 }
 
 /* set block to input value if value is legal*/
@@ -67,14 +74,16 @@ void save(char *link,Board *board) {
         if (z == 0) {
             fix_error(arr, error, dimension, x, y, 0, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
-            add(lst, x, y, arr[x][y]);
+            if(!add(lst, x, y, arr[x][y]))// failed allocation
+                return;
             arr[x][y] = 0;
             print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
             return;
         }
 //change condition here,error value is ok
       //  if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
-    add(lst, x, y, arr[x][y]);
+    if(!add(lst, x, y, arr[x][y]))
+        return;
     arr[x][y] = z;
             fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
@@ -138,3 +147,15 @@ void save(char *link,Board *board) {
         free_arrays(temp,dimension);
         print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
     }
+
+    void guess(int x,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
+        if(is_errorneous(error,dimension))
+        {
+            printf("Validation can't be executed because board is errorneous.\n");
+            return;;
+        }
+    }
+
+    /*void generate(int x,int y,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
+
+    }*/

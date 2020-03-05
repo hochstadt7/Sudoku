@@ -21,7 +21,7 @@ int is_empty(Stack *memory);/*return whether stack is empty*/
 void pop(Stack *memory);/*pop last move inserted to stack*/
 Move *create_move(int row,int col,int value);
 Move* top(Stack *memory);/*look at last move inserted to stack*/
-void push(Stack *memory,int row,int col,int value);/*insert move to stack,represented by row,column and value*/
+Move* push(Stack *memory,int row,int col,int value);/*insert move to stack,represented by row,column and value*/
 void print_stack(Stack *stk);
 void free_stack(Stack *stk);/*free memory of stack*/
 

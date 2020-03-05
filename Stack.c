@@ -45,11 +45,11 @@ Move* top(Stack *memory){
     return memory->top;
 }
 
-void push(Stack *memory,int row,int col,int value) {
+Move* push(Stack *memory,int row,int col,int value) {
     Move *new = create_move(row, col, value);
     if (!new){
         printf("Stack allocation failed");
-        return;
+        return NULL;
     }
 
     if (!memory->top){
@@ -59,6 +59,7 @@ void push(Stack *memory,int row,int col,int value) {
         memory->top=new;
         new->next=temp;
     }
+    return new;
 }
 
 void print_stack(Stack *stk){
@@ -72,6 +73,7 @@ void free_stack(Stack *stk){
     while (stk->top!=NULL){
         pop(stk);
     }
+    free(stk);
 }
 
 

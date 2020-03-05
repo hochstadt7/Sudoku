@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "Board.h"
 #include "MainAux.h"
-//#include "History.h"
 
 
 List *create_list() {
@@ -26,13 +25,13 @@ Node* create_node(int row, int col,int val){
     return temp;
 }
 
-
-void add(List* lst,int row,int col,int val){
+/*add move to the move's list*/
+Node* add(List* lst,int row,int col,int val){
     Node *tmp;
     Node* node=create_node(row,col,val);
     if(node==NULL) {
         printf("Node allocation has failed\n");
-        return;
+        return NULL;
     }
     if(lst->head==NULL){
         lst->head=node;
@@ -52,7 +51,9 @@ void add(List* lst,int row,int col,int val){
         node->prev=lst->curr;
         lst->curr=lst->curr->next;
     }
+    return node;
 }
+/*undo all moves*/
 void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block,int col_per_block,List *lst){
     if(lst->head==NULL)
         return;
@@ -65,7 +66,7 @@ void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block
     }
     print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
 }
-
+/*free list resources*/
 void free_lst(List *lst){
     if(lst->head==NULL)
     {
@@ -133,7 +134,7 @@ board->col_per_block=col_per_block;
 board->mode=Init;
 return board;
 }
-
+/*free all board resources*/
 void destroy_board(Board* board){
     if(!board)
         return;
@@ -144,10 +145,11 @@ void destroy_board(Board* board){
     free(board->arr);
     free(board);
 }
+/*printing the board according to the specified format*/
 void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
     int index_row, index_col, index_block, blocks_per_row,num_dash;
-    blocks_per_row = dimension / col_per_block;
-    num_dash=blocks_per_row*4*col_per_block+1;
+    blocks_per_row = dimension /col_per_block;
+    num_dash=4*dimension+row_per_block+1;
     for (index_row = 0; index_row < dimension; index_row++) {
         if (index_row % row_per_block == 0) {
             for(index_block=0; index_block<num_dash; index_block++) {
@@ -156,17 +158,17 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
             printf("\n");
         }
         for (index_block = 0; index_block < blocks_per_row; index_block++) {
-            printf("| ");
+            printf("|");
             for (index_col = 0; index_col < col_per_block; index_col++) {
                 if (arr[index_row][index_col + col_per_block * index_block] != 0) {
 
                     if (fixed[index_row][index_col + col_per_block * index_block] != 0)
                         printf(" %2d.", arr[index_row][index_col + col_per_block * index_block]);
-                    else if(error[index_row][index_col + col_per_block * index_block] != 0){
+                    else if(error[index_row][index_col + col_per_block * index_block] != 0){//add condition-mode is solve
                     printf(" %2d*", arr[index_row][index_col + col_per_block * index_block]);
                     }
                     else
-                        printf("%2d ", arr[index_row][index_col + col_per_block * index_block]);
+                        printf(" %2d ", arr[index_row][index_col + col_per_block * index_block]);
                 } else {
                     printf("   ");
                 }
@@ -174,14 +176,14 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
         }
         printf("|\n");
     }
-    printf("----------------------------------\n");
+    for(index_block=0; index_block<num_dash; index_block++) {
+        printf("-");
+    }
 }
-
-//||lst->curr->prev==NULL
-
+/*undo move*/
 void undo(int **arr,List *lst){
     int temp;
-    if(lst->curr==NULL){
+    if(lst->curr==NULL){//no move to undo
         printf("Can't undo");
         return;
     } else{
@@ -192,11 +194,11 @@ void undo(int **arr,List *lst){
         lst->curr=lst->curr->prev;
     }
 }
-
+/*redo move*/
 void redo(int **arr,List *lst) {
     int temp;
     if(lst->curr==NULL){
-        if(lst->head==NULL) {
+        if(lst->head==NULL) {//no move to redo
             printf("Can't redo");
             return;
         }

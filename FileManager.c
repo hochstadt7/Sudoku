@@ -33,7 +33,7 @@ Board* un_format(FILE *dest){
 
 int is_ok(const char *fix){//fixed=2 not fixed=1 not legal=0
     int index=1,fixed=0;
-    if(!('0'<=fix[0]&&fix[0]<='9'))//not necessery 9
+    if(!('0'<=fix[0]&&fix[0]<='9'))
         return  0;
     while (fix[index]!='\0'&&index<3){
         if(fixed==1)
@@ -56,7 +56,7 @@ Board* load(char *link) {
 
     /*read dimensions*/
     FILE *dest = NULL;
-    char input[125], *num = NULL;
+    char input[125], *num = NULL,stam[125];
     int index, dimension, row_for_block, col_for_block, loop,is_num,is_legal;
     Board *new;
     dest = fopen(link, "r");
@@ -104,7 +104,11 @@ Board* load(char *link) {
                     return un_format(dest);
                 new->arr[loop][index]=is_num;
                 if(is_legal==2)//fixed value
+                {
+                    if(is_num==0)// 0 fixed?? illegal
+                        return un_format(dest);
                     new->fixed[loop][index]=1;
+                }
             }
             num = strtok(NULL, DELIMITER);
         }
@@ -113,12 +117,14 @@ Board* load(char *link) {
         }
     }
     if(!feof(dest)) {// still not finish reading, might be illegal
+        input[0]='\0';//"empty" buffer
         do {
             fgets(input, 125, dest);
             num = strtok(input, DELIMITER);
-        } while (num == NULL && !feof(dest));
-        if (num != NULL)
+        } while (num == NULL&&!feof(dest));
+        if (num != NULL) {// Problem if there is one enter. why??
             return un_format(dest);
+        }
     }
     fclose(dest);
     // need to add conditions:

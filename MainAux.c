@@ -61,7 +61,6 @@ for(index_row=0; index_row<dimension; index_row++ ){
                       index_row - index_row % row_per_block, index_col - index_col % col_per_block, row_per_block,col_per_block);
 
         }
-        printf("!");
     }
 
 }
