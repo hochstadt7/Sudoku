@@ -5,5 +5,5 @@
 #ifndef BIGPROJECT_SOLVE_H
 #define BIGPROJECT_SOLVE_H
 
-int deter_solve(int **solution, int dimension, int row_per_block, int col_per_block);/*check if solution exist*/
+int deter_solve(int **solution,int **error, int dimension, int row_per_block, int col_per_block);/*check if solution exist*/
 #endif //BIGPROJECT_SOLVE_H

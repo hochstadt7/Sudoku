@@ -87,7 +87,7 @@ void print_list(List *lst) {
         tmp = tmp->next;
     }
 }
-
+/*create board based on the given parameters*/
 Board* create_board(int dimension,int row_per_block,int col_per_block){
 Board* board=(Board*) malloc(sizeof(Board));
 if(!board) {
@@ -162,7 +162,7 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
             for (index_col = 0; index_col < col_per_block; index_col++) {
                 if (arr[index_row][index_col + col_per_block * index_block] != 0) {
 
-                    if (fixed[index_row][index_col + col_per_block * index_block] != 0)
+                    if (fixed[index_row][index_col + col_per_block * index_block] != 0)//fixed cell
                         printf(" %2d.", arr[index_row][index_col + col_per_block * index_block]);
                     else if(error[index_row][index_col + col_per_block * index_block] != 0){//add condition-mode is solve
                     printf(" %2d*", arr[index_row][index_col + col_per_block * index_block]);
@@ -170,7 +170,7 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
                     else
                         printf(" %2d ", arr[index_row][index_col + col_per_block * index_block]);
                 } else {
-                    printf("   ");
+                    printf("    ");
                 }
             }
         }
@@ -179,6 +179,7 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
     for(index_block=0; index_block<num_dash; index_block++) {
         printf("-");
     }
+    //printf("\n");
 }
 /*undo move*/
 void undo(int **arr,List *lst){

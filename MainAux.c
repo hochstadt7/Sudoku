@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Board.h"
 #include "ValidBoard.h"
-
+/*initilaize the array*/
 int** first_init(int dimension) {
     int i;
     int **arr=(int **) calloc(dimension , sizeof(int *));
@@ -20,14 +19,14 @@ int** first_init(int dimension) {
     }
     return arr;
 }
-
+/*free array resources*/
 void free_arrays(int **arr,int dimension){
     int index;
     for(index=0; index<dimension; index++) {
         free(arr[index]);
     }
 }
-
+/*make a copy of a given array*/
 void copy_arrays(int **copy, int**paste,int dimension)
 {
     int index_row,index_col;
@@ -39,7 +38,7 @@ void copy_arrays(int **copy, int**paste,int dimension)
     }
 
 }
-
+/*find wether the board is errorneous*/
 int is_errorneous(int **error,int dimension){
     int row,col;
     for(row=0; row<dimension; row++){

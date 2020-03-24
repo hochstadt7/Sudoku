@@ -27,6 +27,8 @@ void print_me(int **arr,int dimension)
 
 void test_all() {
 
-    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\type",NULL);
-    print_board(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block);
+    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\pelet",NULL,Solve);
+print_me(game->arr,game->dimension);
+  printf("%d", deter_solve(game->arr,game->error, game->dimension,game->row_per_block,game->col_per_block));
+printf("aa");
 }

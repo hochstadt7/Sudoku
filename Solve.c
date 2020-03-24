@@ -2,22 +2,23 @@
 // Created by LENOVO on 02/01/2020.
 //
 #include <stdio.h>
-#include <stdlib.h>
-#include "Board.h"
-#include "Solve.h"
 #include "ValidBoard.h"
 #include "Stack.h"
 #include "MainAux.h"
-#include "TestGame.h"
+
 
 /*count number of possible solutions for the given board*/
-int deter_solve(int **solution, int dimension, int row_per_block, int col_per_block) {
-
+int deter_solve(int **solution,int **error, int dimension, int row_per_block, int col_per_block) {
+if(is_errorneous(error,dimension))//board is erroneous- no solution
+{
+    printf("ffffff");
+    return 0;
+}
     Stack *stk = create_stack();
     Move *up;
     int  curr_row,curr_col,found_legal,count=0,is_sol=0;
-    int **arr=first_init((dimension));//index unfilled blocks
-    for(curr_row=0; curr_row<dimension; curr_row++) {
+    int **arr=first_init((dimension));
+    for(curr_row=0; curr_row<dimension; curr_row++) {//index unfilled cells
         for (curr_col = 0; curr_col < dimension; curr_col++) {
           if(solution[curr_row][curr_col]!=0)
               arr[curr_row][curr_col]=1;
@@ -39,12 +40,12 @@ int deter_solve(int **solution, int dimension, int row_per_block, int col_per_bl
 
                 if (is_valid(solution, dimension, curr_row, curr_col, up->val, row_per_block, col_per_block)) {
                     solution[curr_row][curr_col] = up->val;
-                    found_legal = 1;
+                    found_legal = 1;// legal value was found
                     break;
                 }
             }
         }
-        if (found_legal==0&&arr[curr_row][curr_col]==0) {// no solution to this empty block
+        if (found_legal==0&&arr[curr_row][curr_col]==0) {// no solution to this empty cell
             solution[curr_row][curr_col] = 0;
             do{
                 pop(stk);
@@ -56,8 +57,7 @@ int deter_solve(int **solution, int dimension, int row_per_block, int col_per_bl
                 {
                     /*free_stack(stk);
                     return 1;*/
-                    print_me(solution,dimension);
-                    printf("\n\n");
+                    
                     count++;
                     if(arr[curr_row][curr_col]==1)
                     {
@@ -65,16 +65,16 @@ int deter_solve(int **solution, int dimension, int row_per_block, int col_per_bl
                             pop(stk);
                         }while (!is_empty(stk)&&arr[stk->top->row][stk->top->col]==1);
                     } else{
-                      is_sol=1;
+                      is_sol=1;//we have found a new solution just now
                     }
                 }
                 else{
-                    if(!push(stk, curr_row+1, 0, 0))
+                    if(!push(stk, curr_row+1, 0, 0))//move to the next cell
                         return 0;
                 }
             }
             else{
-                if(!push(stk, curr_row, curr_col+1, 0))
+                if(!push(stk, curr_row, curr_col+1, 0))//backtracking
                     return 0;
             }
             }

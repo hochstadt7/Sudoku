@@ -1,17 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Game.h"
 #include "Board.h"
-#include <string.h>
 #include "ValidBoard.h"
 #include "FileManager.h"
 #include "MainAux.h"
-
+/*give a hint to a value in a specified square*/
 void hint(int **arr,int **fixed,int **solution,int **error,int dimension, int y, int x) {
-    if(is_errorneous(error,dimension)||fixed[x][y]==1||arr[x][y]!=0)// 3 conditions
+    if(is_errorneous(error,dimension)) {//board is errorneous
+        printf("You can't get a hint from an errorneous board\n");
+        return;
+    }
+    if(fixed[x][y]==1){//specified cell is fixed
+        printf("Can't give a hint to a fixed cell\n");
+        return;
+    }
+    if(arr[x][y]!=0){//specified cell is full
+        printf("Can't give a hint to a full cell");
+        return;
+    }
+    //need to find if solvable using ilp and than:
     printf("Hint: set cell to %d\n", solution[x][y]);
-}
 
+}
+/*save the board in a new file in the specified link*/
 void save(char *link,Board *board) {
     int index_row, index_col;
     //check if board is erroneous, and in edit mode or not solvable (need to add not solvable condition after implemnting ilp)
@@ -99,15 +110,17 @@ void save(char *link,Board *board) {
         board->mark_error = mark;
     }
 
-    Board* edit(char *link,Board *old) {
-        Board *new=load(link);
+    Board* edit(char *link,Board *old, enum status mode) {
+        Board *new=load(link,mode);
         if(new!=NULL){//if edit didnt fail, free current board memory "forget him"
+            new->mode=Edit;
             if(old!=NULL)
         destroy_board(old);
             initialize(new->arr,new->fixed,new->solution,new->error,new->dimension,new->row_per_block,new->col_per_block);
         }
         return new;
     }
+
 
     void autofill(int **arr, int **fixed, int **error, int dimension, int row_per_block, int col_per_block, List *lst) {
         int row, col, num, count, candidate = 0;
@@ -137,7 +150,8 @@ void save(char *link,Board *board) {
             for (col = 0; col < dimension; col++) {
                 if (temp[row][col] != 0) {
                     candidate = temp[row][col];
-                    add(lst, row, col, arr[row][col]);
+                    if(!add(lst, row, col, arr[row][col]))//allocation failed
+                        return;;
                     arr[row][col] = candidate;//add to memory?
                     fix_error(arr, error, dimension, row, col, candidate, row - row % row_per_block,
                               col - col % col_per_block, row_per_block, col_per_block);

@@ -14,7 +14,7 @@ for(row=0; row<dimension; row++){
     for(col=0; col<dimension; col++){
     if(fixed[row][col]==1){
         if(!is_valid(temp,dimension,row,col,arr[row][col],row_per_block,col_per_block)){
-            printf("Fixed cells are not legal in solve mode");
+            printf("Fixed cells are not legal in solve mode\n");
             return 0;
         }
         temp[row][col]=arr[row][col];
@@ -30,7 +30,7 @@ Board* un_format(FILE *dest){
     fclose(dest);
     return NULL;
 }
-
+/*check wether the cell has legal value*/
 int is_ok(const char *fix){//fixed=2 not fixed=1 not legal=0
     int index=1,fixed=0;
     if(!('0'<=fix[0]&&fix[0]<='9'))
@@ -44,15 +44,15 @@ int is_ok(const char *fix){//fixed=2 not fixed=1 not legal=0
             fixed=1;
         index++;
     }
-    if(index==3&&(fixed==0||fix[index]!='\0'))//3 digits, no dot or to long
+    if(index==3&&(fixed==0||fix[index]!='\0'))
         return 0;
     if(fixed==0)
         return 1;
     else
         return 2;
 }
-
-Board* load(char *link) {
+/*load a new board based on the file input*/
+Board* load(char *link,enum status mode) {
 
     /*read dimensions*/
     FILE *dest = NULL;
@@ -129,7 +129,7 @@ Board* load(char *link) {
     fclose(dest);
     // need to add conditions:
     // 1. in solve mode- need to check that fixed cells are legal (code is ready above)
-    if(!fixed_are_valid(new->arr,new->fixed,new->dimension,new->row_per_block,new->col_per_block))
+    if(mode==Solve&&!fixed_are_valid(new->arr,new->fixed,new->dimension,new->row_per_block,new->col_per_block))
         return un_format(dest);
     return new;
 }
