@@ -7,7 +7,7 @@
 #include "MainAux.h"
 
 
-/*count number of possible solutions for the given board*/
+
 int deter_solve(int **solution,int **error, int dimension, int row_per_block, int col_per_block) {
 if(is_errorneous(error,dimension))//board is erroneous- no solution
 {

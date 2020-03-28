@@ -77,7 +77,7 @@ void save(char *link,Board *board) {
             print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
             return;
         }
-        if (fixed[x][y] == 1) {// can change in edit mode?
+        if (fixed[x][y] == 1) {// add condition-solve mode
             printf("Error: cell is fixed\n");
             return;
         }
@@ -105,7 +105,7 @@ void save(char *link,Board *board) {
             return;
         }*/
     }
-
+/*Sets the "mark errors" setting to X, where X is either 0 or 1*/
     void mark_errors(int mark, Board *board) {
         board->mark_error = mark;
     }
@@ -170,6 +170,10 @@ void save(char *link,Board *board) {
         }
     }
 
-    /*void generate(int x,int y,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
 
-    }*/
+
+    void exit_game(Board *board){
+        destroy_board(board);
+        printf("Exiting game...");
+        exit(0);
+    }

@@ -30,5 +30,4 @@ void test_all() {
     Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\pelet",NULL,Solve);
 print_me(game->arr,game->dimension);
   printf("%d", deter_solve(game->arr,game->error, game->dimension,game->row_per_block,game->col_per_block));
-printf("aa");
 }

@@ -3,17 +3,20 @@
 #include "ValidBoard.h"
 /*initilaize the array*/
 int** first_init(int dimension) {
-    int i;
+    int i,j;
     int **arr=(int **) calloc(dimension , sizeof(int *));
     if(!arr)
     {
-        printf("first_init failed");
+        printf("first_init failed.\n");
         return NULL;
     }
     for (i = 0; i < dimension; i++) {
         arr[i] = (int *) calloc(dimension , sizeof(int));
         if (!arr[i] ) {
-            printf("first_init failed");
+            for(j=0; j<i; j++)
+                free(arr[j]);
+            free(arr);
+            printf("first_init failed.\n");
             return NULL;
         }
     }

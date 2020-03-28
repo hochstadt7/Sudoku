@@ -25,10 +25,10 @@ typedef struct linked_list{
 List *create_list();/*create the timeline of moves*/
 Node* create_node();/* create holder for row,column,value*/
 Node* add(List* lst,int row,int col,int val);/*add last move to the moves timeline*/
-void undo(int **arr,List *lst);/*cancel last move*/
-void redo(int **arr,List *lst);/*redo last move*/
+void undo(int **arr,List *lst);/*Undo a previous move done by the user*/
+void redo(int **arr,List *lst);/*Redo a move previously undone by the user*/
 void print_list(List *lst);/*print the list*/
-void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block,int col_per_block,List *lst);/*cancel all moves*/
+void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block,int col_per_block,List *lst);/*Undo all moves, reverting the board to its original loaded state*/
 
 /*board game*/
 typedef struct board{
@@ -40,7 +40,7 @@ typedef struct board{
 }Board;
 Board* create_board(int dimension,int row_per_block,int col_per_block);/* create board game*/
 void destroy_board(Board* board);/*free memory allocated for board*/
-void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block);/*printing board*/
+void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block);/*Prints the board to the user*/
 
 
 #endif //BIGPROJECT_BOARD_H
