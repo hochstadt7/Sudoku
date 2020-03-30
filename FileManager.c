@@ -10,23 +10,25 @@
 int fixed_are_valid(int **arr,int **fixed,int dimension,int row_per_block,int col_per_block){
     int row,col;
     int **temp=first_init(dimension);
+    if(!temp)
+        return 0;
 for(row=0; row<dimension; row++){
     for(col=0; col<dimension; col++){
     if(fixed[row][col]==1){
         if(!is_valid(temp,dimension,row,col,arr[row][col],row_per_block,col_per_block)){
-            printf("Fixed cells are not legal in solve mode\n");
+            printf("Fixed cells are not legal in solve mode.\n");
             return 0;
         }
         temp[row][col]=arr[row][col];
     }
     }
 }
-free(temp);
+free_arrays(temp,dimension);
     return 1;
 }
 
 Board* un_format(FILE *dest){
-    printf("File isn't in correct form\n");
+    printf("File isn't in correct form.\n");
     fclose(dest);
     return NULL;
 }
@@ -61,7 +63,7 @@ Board* load(char *link,enum status mode) {
     Board *new;
     dest = fopen(link, "r");
     if (dest == NULL) {
-        printf("File wasn't opened");
+        printf("File wasn't opened.\n");
         return NULL;
     }
     /*read dimensions*/
@@ -86,7 +88,7 @@ Board* load(char *link,enum status mode) {
     for (loop = 0; loop < dimension; loop++) {
 
         do {
-            fgets(input, 125, dest);
+            fgets(input, 125, dest);// is 125 apropriate???????????
             num= strtok(input, DELIMITER);
         }while(num==NULL&&!feof(dest));
         for (index = 0; index < dimension; index++) {

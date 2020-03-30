@@ -13,5 +13,5 @@ void autofill(int **arr,int **fixed,int **error,int dimension,int row_per_block,
 Board* edit(char *link,Board *old, enum status mode);/*Starts a puzzle in Edit mode, loaded from a file with the name "X", where X includes a full or relative path to the file*/
 void exit_game(Board *board);/*Terminates the program*/
 Board* solve(char *link,Board *old, enum status mode);/*Starts a puzzle in Solve mode, loaded from a file with the name "X", where X includes a full or relative path to the file*/
-void guess(int x,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block)/*Guesses a solution to the current board using LP (not ILP!), with threshold X*/
+void guess(int x,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block);/*Guesses a solution to the current board using LP (not ILP!), with threshold X*/
 #endif //BIGPROJECT_GAME_H

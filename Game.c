@@ -78,7 +78,7 @@ void save(char *link,Board *board) {
             return;
         }
         if (fixed[x][y] == 1) {// add condition-solve mode
-            printf("Error: cell is fixed\n");
+            printf("Error: cell is fixed.\n");
             return;
         }
 
@@ -130,6 +130,8 @@ void save(char *link,Board *board) {
             return;
         }
         temp=first_init(dimension);
+        if(!temp)
+            return;
         for (row = 0; row < dimension; row++) {
             for (col = 0; col < dimension; col++) {
                 if (arr[row][col] == 0) {
@@ -146,12 +148,22 @@ void save(char *link,Board *board) {
                 }
             }
         }
+        count=0; //now will count successfull adds
         for (row = 0; row < dimension; row++) {
             for (col = 0; col < dimension; col++) {
                 if (temp[row][col] != 0) {
                     candidate = temp[row][col];
-                    if(!add(lst, row, col, arr[row][col]))//allocation failed
-                        return;;
+                    if(!add(lst, row, col, arr[row][col]))
+                    {
+                        printf("Look at autofill-wrong alloc case wasnt took care yet\n");
+                        for(num=0; num<count; num++){//need to undo and delete moves already done in this function
+                            undo(arr,lst);
+                            remove_next(lst);// need to verify this work
+                        }
+                        free_arrays(temp,dimension);
+                        return;
+                    }
+                    count++;
                     arr[row][col] = candidate;//add to memory?
                     fix_error(arr, error, dimension, row, col, candidate, row - row % row_per_block,
                               col - col % col_per_block, row_per_block, col_per_block);

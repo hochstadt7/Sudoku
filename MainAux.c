@@ -13,8 +13,9 @@ int** first_init(int dimension) {
     for (i = 0; i < dimension; i++) {
         arr[i] = (int *) calloc(dimension , sizeof(int));
         if (!arr[i] ) {
-            for(j=0; j<i; j++)
+            for(j=0; j<i; j++) {
                 free(arr[j]);
+            }
             free(arr);
             printf("first_init failed.\n");
             return NULL;
@@ -28,6 +29,7 @@ void free_arrays(int **arr,int dimension){
     for(index=0; index<dimension; index++) {
         free(arr[index]);
     }
+    free(arr);
 }
 /*make a copy of a given array*/
 void copy_arrays(int **copy, int**paste,int dimension)

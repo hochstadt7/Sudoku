@@ -29,6 +29,7 @@ void undo(int **arr,List *lst);/*Undo a previous move done by the user*/
 void redo(int **arr,List *lst);/*Redo a move previously undone by the user*/
 void print_list(List *lst);/*print the list*/
 void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block,int col_per_block,List *lst);/*Undo all moves, reverting the board to its original loaded state*/
+void remove_next(List *lst);
 
 /*board game*/
 typedef struct board{

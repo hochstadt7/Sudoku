@@ -11,13 +11,16 @@
 int deter_solve(int **solution,int **error, int dimension, int row_per_block, int col_per_block) {
 if(is_errorneous(error,dimension))//board is erroneous- no solution
 {
-    printf("ffffff");
+    printf("No solution- board is errorneous.\n");
     return 0;
 }
     Stack *stk = create_stack();
     Move *up;
     int  curr_row,curr_col,found_legal,count=0,is_sol=0;
     int **arr=first_init((dimension));
+    if(!arr){
+        return 0;
+    }
     for(curr_row=0; curr_row<dimension; curr_row++) {//index unfilled cells
         for (curr_col = 0; curr_col < dimension; curr_col++) {
           if(solution[curr_row][curr_col]!=0)
