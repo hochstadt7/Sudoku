@@ -13,8 +13,8 @@
 Node* create_cell(int row, int col){
     Node *temp= (Node *) malloc(sizeof(Node));
     if(temp==NULL) {
-        printf("Node allocation failed\n.");
-        return NULL;
+        printf("Node allocation failed.\n");
+        exit(0);
     }
     temp->row=row;temp->col=col;
     return temp;
@@ -37,6 +37,10 @@ int there_are_x_empty(int **arr,int dimension,int x){
 int choose_legal(int **arr,int dimension,int row,int col,int row_per_block,int col_per_block){
     int count=0,val;
     int *legal=malloc(dimension* sizeof(int));
+    if(!legal){
+        printf("Allocation failed.\n");
+        exit(0);
+    }
 for(val=1; val<dimension+1; val++){
 if(is_valid(arr,dimension,row,col,val,row_per_block,col_per_block)){
   legal[count]=val;
@@ -56,27 +60,26 @@ free(legal);
 int fill_x_cells(int **arr,int dimesnion,int x,int count_empty,int row_per_block,int col_per_block){
     int row,col,random,index=0,legal_val=0;
      Node *node;
-     printf("start\n");
     Node **cell=(Node**) malloc(count_empty* sizeof(Node*));//not right?
     if(!cell)
     {
         printf("Allocation failed.\n");
-        return 0;
+        exit(0);
     }
     for(row=0; row<dimesnion; row++){//find all empty cells
         for (col=0; col<dimesnion; col++) {
             if(arr[row][col]==0)
             {
                 node=create_cell(row,col);
-                if(!node)
+                /*if(!node)
                 {
-                    printf("Allocation failed\n.");
                     for(index=0; index<legal_val; index++){
                         free(cell[index]);
                     }
                     free(cell);
                     return 0;
-                }
+                    exit(0);
+                }*/
                 cell[legal_val]=node;//store node
                 legal_val++;
             }
@@ -116,33 +119,32 @@ int keep_y_cells(int **arr,int dimension,int y){
     cell=(Node**)malloc((dimension*dimension)* sizeof(Node*));//not right? maybe node* []
     if(!cell){
         printf("Allocation failed.\n");
-        return 0;
+        exit(0);
     }
 
 for(row=0; row<dimension; row++){
     for(col=0; col<dimension; col++){
         node=create_cell(row,col);
-        if(!node){
-            printf("Allocation failed.\n");
+        /*if(!node){
             for(index=0; index<legal_val; index++){
                 free(cell[index]);
             }
             free(cell);
-            return 0;
-        }
+            exit(0);
+        }*/
         cell[legal_val]=node;//need to check that allocation succeeded
         legal_val++;
     }
 }
 
 temp=first_init(dimension);
-if(!temp){
+/*if(!temp){
     for(index=0; index<legal_val-y+1; index++){//when i free for cell 3, i might free also for other cell with same node!! thats why freeholder-y+1
         free(cell[index]);
     }
     free(cell);
     return 0;
-}
+}*/
 free_holder=legal_val;
 for(row=0; row<y; row++)
 {
@@ -161,7 +163,6 @@ for(row=0; row<dimension; row++){
     }
 }
 
-printf("%d\n",free_holder);
     for(index=0; index<free_holder-y+1; index++){//when i free for cell 3, i might free also for other cell with same node!! thats why freeholder-y+1
         free(cell[index]);
     }

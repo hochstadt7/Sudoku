@@ -12,6 +12,7 @@
 #include "Solve.h"
 #include "Stack.h"
 #include "TestGame.h"
+#include "Autofill.h"
 //#include "History.h"
 
 void print_me(int **arr,int dimension)
@@ -24,20 +25,13 @@ void print_me(int **arr,int dimension)
         }
         printf("\n");
     }
+    printf("\n\n");
 }
 
 void test_all() {
-
+    Board *game2;
     Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\type",NULL,Solve);
-    set(game->arr,game->error,game->dimension,game->fixed,3,4,1,game->row_per_block,game->col_per_block,game->lst);
-    undo(game->arr,game->lst);
-    autofill(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block,game->lst);
-    redo(game->arr,game->lst);
-    undo(game->arr,game->lst);
-    redo(game->arr,game->lst);
     print_me(game->arr,game->dimension);
-
-    destroy_board(game);
 
 }
 int main() {

@@ -8,7 +8,7 @@ List *create_list() {
     List *tmp = (List *) malloc(sizeof(List));
     if(tmp==NULL){
         printf("List allocation failed.\n");
-        return NULL;
+        exit(0);
     }
     tmp->head = NULL;
     tmp->curr = NULL;
@@ -18,7 +18,7 @@ Node* create_node(int row, int col,int val){
     Node *temp= (Node *) malloc(sizeof(Node));
     if(temp==NULL) {
         printf("Node allocation failed");
-        return NULL;
+        exit(0);
     }
     temp->row=row;temp->col=col;temp->val=val;
     temp->next=NULL;temp->prev=NULL;
@@ -29,10 +29,10 @@ Node* create_node(int row, int col,int val){
 Node* add(List* lst,int row,int col,int val){
     Node *tmp;
     Node* node=create_node(row,col,val);
-    if(node==NULL) {
+    /*if(node==NULL) {
         printf("Node allocation has failed.\n");
-        return NULL;//need acctually to end the game!?
-    }
+        exit(0);//need acctually to end the game!?
+    }*/
     if(lst->head==NULL){
         lst->head=node;
         lst->curr=node;
@@ -67,20 +67,7 @@ Node* add(List* lst,int row,int col,int val){
     }
     return node;
 }
-//assumption:curr->next isnt null (curr himself can be null, but than head isnt null, this is because this method always come after successfull undo (in autofill)
-void remove_next(List *lst){
-Node *tmp;
-if(!lst->curr){//need to remove head
-tmp=lst->head;
-lst->head=lst->head->next;
-}
-else{//need to remove curr->next
-    tmp=lst->curr->next;
-    lst->curr->next=lst->curr->next->next;
-    lst->curr->next->prev=lst->curr;
-}
-free(tmp);
-}
+
 
 /*undo all moves*/
 void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block,int col_per_block,List *lst){
@@ -113,7 +100,7 @@ void free_lst(List *lst){
 void print_list(List *lst) {
     Node *tmp = lst->head;
     while (tmp != NULL) {
-        printf("row=%d col=%d value=%d\n", tmp->row, tmp->col,tmp->val);
+        printf("row=%d col=%d value=%d.\n", tmp->row, tmp->col,tmp->val);
         tmp = tmp->next;
     }
 }
@@ -121,53 +108,53 @@ void print_list(List *lst) {
 Board* create_board(int dimension,int row_per_block,int col_per_block){
 Board* board=(Board*) malloc(sizeof(Board));
 if(!board) {
-    printf("Create_board failed");
-    return NULL;
+    printf("Create_board failed.\n");
+    exit(0);
 }
 board->arr=first_init(dimension);
-if(board->arr==NULL) {
-    printf("Create_board failed");
+/*if(board->arr==NULL) {
+    printf("Create_board failed.\n");
     free(board);
-    return NULL;
-}
+    exit(0);
+}*/
 board->fixed=first_init(dimension);
-if(board->fixed==NULL)
+/*if(board->fixed==NULL)
 {
-    printf("Create_board failed");
+    printf("Create_board failed.\n");
     free_arrays(board->arr,board->dimension);
     free(board);
-    return  NULL;
-}
+    exit(0);
+}*/
 board->solution=first_init(dimension);
-    if(board->solution==NULL)
+  /*  if(board->solution==NULL)
     {
-        printf("Create_board failed");
+        printf("Create_board failed.\n");
         free_arrays(board->fixed,board->dimension);
         free_arrays(board->arr,board->dimension);
         free(board);
-        return NULL;
-    }
+        exit(0);
+    }*/
     board->error=first_init(dimension);
-    if(board->error==NULL)
+   /* if(board->error==NULL)
     {
-        printf("Create_board failed");
-        free_arrays(board->solution,board->dimension);
+        printf("Create_board failed.\n");
+       free_arrays(board->solution,board->dimension);
         free_arrays(board->fixed,board->dimension);
         free_arrays(board->arr,board->dimension);
         free(board);
-        return NULL;
-    }
+        exit(0);
+    }*/
     board->lst=create_list();
-    if(board->lst==NULL)
+   /* if(board->lst==NULL)
     {
-        printf("Create_board failed");
+        printf("Create_board failed.\n");
         free_arrays(board->error,board->dimension);
         free_arrays(board->solution,board->dimension);
         free_arrays(board->fixed,board->dimension);
         free_arrays(board->arr,board->dimension);
         free(board);
-        return NULL;
-    }
+        exit(0);
+    }*/
    board->dimension=dimension;board->mark_error=0;board->is_over=0;
 board->row_per_block=row_per_block;
 board->col_per_block=col_per_block;

@@ -3,4 +3,4 @@ project(Bigproject C)
 
 set(CMAKE_C_STANDARD 90)
 
-add_executable(Bigproject main.c Game.c Game.h Board.h Board.c MainAux.c MainAux.h Interface.c Interface.h Solve.c Solve.h History.c History.h ILP.c ILP.h Parser.c Parser.h Stack.c Stack.h FileManager.c FileManager.h ValidBoard.c ValidBoard.h ManageMode.c ManageMode.h TestGame.c TestGame.h Generate.c Generate.h)
+add_executable(Bigproject main.c Game.c Game.h Board.h Board.c MainAux.c MainAux.h Interface.c Interface.h Solve.c Solve.h History.c History.h ILP.c ILP.h Parser.c Parser.h Stack.c Stack.h FileManager.c FileManager.h ValidBoard.c ValidBoard.h ManageMode.c ManageMode.h TestGame.c TestGame.h Generate.c Generate.h Autofill.c Autofill.h)
