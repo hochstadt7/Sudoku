@@ -49,6 +49,8 @@ Board* un_format(FILE *dest){
 }
 /*check wether the cell has legal value*/
 int is_ok(const char *fix){//fixed=2 not fixed=1 not legal=0
+    /*if(fix==NULL) if i get a failure on given file load, try to turn on this two rows maybe it will help
+        return 0;*/
     int index=1,fixed=0;
     if(!('0'<=fix[0]&&fix[0]<='9'))
         return  0;
@@ -95,7 +97,7 @@ int get_rid_row(int dimension,int *loop,Board *new,char **num,int range){
 
 /*load a new board based on the file input*/
 Board* load(char *link,enum status mode) {
-
+char* a;
     /*read dimensions*/
     FILE *dest = NULL;
     char input[125], *num = NULL, stam[125];
@@ -120,7 +122,6 @@ Board* load(char *link,enum status mode) {
     row_for_block = strtol(num, NULL, 10);
     if (row_for_block < 1)//ilegal dimension
         return un_format(dest);
-
     num = strtok(NULL, DELIMITER);
     if (num == NULL) {
         do {
@@ -131,7 +132,7 @@ Board* load(char *link,enum status mode) {
     }
     if (feof(dest) || is_ok(num) != 1){
         return un_format(dest);
-}
+    }
         col_for_block=strtol(num, NULL, 10);
         if(col_for_block<1)
             return un_format(dest);
@@ -151,14 +152,13 @@ Board* load(char *link,enum status mode) {
 
     /*read content of board*/
     while (!feof(dest)&&loop<range){
-        do {
-            fgets(input, 125, dest);// is 125 apropriate???????????
-            num = strtok(input, DELIMITER);
-        } while (num == NULL && !feof(dest));//get rid of abudants rows
 
-        if(feof(dest))
-            return un_format(dest);
-        if(get_rid_row(dimension,&loop,new,&num,range)==0||num!=NULL)
+        do {
+        a=    fgets(input, 125, dest);// is 125 apropriate???????????
+            num = strtok(input, DELIMITER);
+        } while (num == NULL && (!feof(dest)));//get rid of abudants rows
+
+        if(get_rid_row(dimension,&loop,new,&num,range)==0||num!=NULL||a==NULL)
             return un_format(dest);
 
     }

@@ -30,7 +30,7 @@ void print_me(int **arr,int dimension)
 
 void test_all() {
     Board *game2;
-    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\type",NULL,Solve);
+    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\test",NULL,Solve);
     print_me(game->arr,game->dimension);
 
 }
