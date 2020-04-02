@@ -4,6 +4,7 @@
 #include <string.h>
 #include "ValidBoard.h"
 #include "MainAux.h"
+#define ROW 250
 #define DELIMITER " \t\r\n"
 
 /*check wether fixed cells are legal in solve mode*/
@@ -100,8 +101,8 @@ Board* load(char *link,enum status mode) {
 char* a;
     /*read dimensions*/
     FILE *dest = NULL;
-    char input[125], *num = NULL, stam[125];
-    int  dimension, row_for_block, col_for_block, loop=0, is_num, is_legal,range;
+    char input[ROW], *num = NULL;
+    int  dimension, row_for_block, col_for_block, loop=0,range;
     Board *new;
     dest = fopen(link, "r");
     if (dest == NULL) {
@@ -111,7 +112,7 @@ char* a;
     }
     /*read dimensions*/
     do {
-        fgets(input, 125, dest);// is 125 apropriate???????????
+        fgets(input, ROW, dest);// is 125 apropriate???????????
         num = strtok(input, DELIMITER);
     } while (num == NULL && !feof(dest));//get rid of abudants rows
 
@@ -125,7 +126,7 @@ char* a;
     num = strtok(NULL, DELIMITER);
     if (num == NULL) {
         do {
-            fgets(input, 125, dest);// is 125 apropriate???????????
+            fgets(input, ROW, dest);// is 125 apropriate???????????
             num = strtok(input, DELIMITER);
         } while (num == NULL && !feof(dest));//get rid of abudants rows
 
@@ -154,7 +155,7 @@ char* a;
     while (!feof(dest)&&loop<range){
 
         do {
-        a=    fgets(input, 125, dest);// is 125 apropriate???????????
+        a=    fgets(input, ROW, dest);// is 125 apropriate???????????
             num = strtok(input, DELIMITER);
         } while (num == NULL && (!feof(dest)));//get rid of abudants rows
 
@@ -168,7 +169,7 @@ char* a;
     if(!feof(dest)) {// still not finish reading, might be illegal
         input[0]='\0';//"empty" buffer
         do {
-            fgets(input, 125, dest);
+            fgets(input, ROW, dest);
             num = strtok(input, DELIMITER);
         } while (num == NULL&&!feof(dest));
         if (num != NULL) {// Problem if there is one enter. why??

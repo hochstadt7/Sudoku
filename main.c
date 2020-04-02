@@ -30,7 +30,13 @@ void print_me(int **arr,int dimension)
 
 void test_all() {
     Board *game2;
-    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\test",NULL,Solve);
+    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\type",NULL,Solve);
+    set(game->arr,game->error,game->dimension,game->fixed,2,1,4,game->row_per_block,game->col_per_block,game->lst);
+    autofill(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block,game->lst);
+    set(game->arr,game->error,game->dimension,game->fixed,2,1,5,game->row_per_block,game->col_per_block,game->lst);
+    undo(game->arr,game->lst);
+    undo(game->arr,game->lst);
+    redo(game->arr,game->lst);
     print_me(game->arr,game->dimension);
 
 }

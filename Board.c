@@ -14,21 +14,21 @@ List *create_list() {
     tmp->curr = NULL;
     return tmp;
 }
-Node* create_node(int row, int col,int val){
+Node* create_node(int row, int col,int val, enum sequence seq){
     Node *temp= (Node *) malloc(sizeof(Node));
     if(temp==NULL) {
-        printf("Node allocation failed");
+        printf("Node allocation failed.\n");
         exit(0);
     }
-    temp->row=row;temp->col=col;temp->val=val;
+    temp->row=row;temp->col=col;temp->val=val;temp->seq=seq;
     temp->next=NULL;temp->prev=NULL;
     return temp;
 }
 
 /*add move to the move's list*/
-Node* add(List* lst,int row,int col,int val){
+Node* add(List* lst,int row,int col,int val, enum sequence seq){
     Node *tmp;
-    Node* node=create_node(row,col,val);
+    Node* node=create_node(row,col,val,seq);
     /*if(node==NULL) {
         printf("Node allocation has failed.\n");
         exit(0);//need acctually to end the game!?
@@ -206,45 +206,61 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
     for(index_block=0; index_block<num_dash; index_block++) {
         printf("-");
     }
-    //printf("\n");
+    printf("\n");
 }
 /*undo move*/
 void undo(int **arr,List *lst){
-    int temp;
+    int temp,special;
 
     if(lst->curr==NULL){//no move to undo
         printf("Can't undo.\n");
         return;
     } else{
-        temp=arr[lst->curr->row][lst->curr->col];
-        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
-        printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
-        lst->curr->val=temp;
-        lst->curr=lst->curr->prev;// may be null
-
+        special=lst->curr->seq;
+        do {
+            temp = arr[lst->curr->row][lst->curr->col];
+            arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+            printf("Block in row %d, column %d was set to %d.\n", lst->curr->row+1, lst->curr->col+1, lst->curr->val);
+            lst->curr->val = temp;
+            lst->curr = lst->curr->prev;// may be null
+        }while (lst->curr!=NULL&&lst->curr->seq==special&&special!=Normal);//as part of autofill ,need to undo several moves
     }
 }
 /*redo move*/
 void redo(int **arr,List *lst) {
-    int temp;
-    if(lst->curr==NULL){
-        if(lst->head==NULL) {//no move to redo
+    int temp,special;
+    if(lst->curr==NULL) {
+        if (lst->head == NULL) {//no move to redo
             printf("Can't redo.\n");
             return;
         }
-        lst->curr=lst->head;
-        temp=arr[lst->curr->row][lst->curr->col];
-        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
-        printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
-        lst->curr->val=temp;
+        lst->curr = lst->head;//problem to redo several moves
+        temp = arr[lst->curr->row][lst->curr->col];
+        arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+        printf("Block in row %d, column %d was set to %d.\n", lst->curr->row, lst->curr->col, lst->curr->val);
+        lst->curr->val = temp;
+        if (lst->curr->next == NULL)
+            return;
+        special = lst->curr->next->seq;
+        do {
+            lst->curr = lst->curr->next;
+            temp = arr[lst->curr->row][lst->curr->col];
+            arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+            printf("Block in row %d, column %d was set to %d.\n", lst->curr->row, lst->curr->col, lst->curr->val);
+            lst->curr->val = temp;
+
+        }while (lst->curr->next != NULL && lst->curr->next->seq == special&&special!=Normal);
 
     } else{
     if(lst->curr->next==NULL){printf("Can't redo.\n");return;}
-    lst->curr=lst->curr->next;
-        temp=arr[lst->curr->row][lst->curr->col];
-        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
-        printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
-        lst->curr->val=temp;
+     special=lst->curr->next->seq;
+    do {
+        lst->curr = lst->curr->next;
+        temp = arr[lst->curr->row][lst->curr->col];
+        arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+        printf("Block in row %d, column %d was set to %d.\n", lst->curr->row + 1, lst->curr->col + 1, lst->curr->val);
+        lst->curr->val = temp;
+    }while (lst->curr->next!=NULL&&lst->curr->next->seq==special&&special!=Normal);//as part of special command ,need to undo several moves
 
     }
 }

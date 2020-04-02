@@ -73,7 +73,7 @@ void save(char *link,Board *board) {
     void set(int **arr, int **error, int dimension, int **fixed, int y, int x, int z, int row_per_block, int col_per_block,
         List *lst) {
         if(arr[x][y]==z){//if setting to same value before
-            add(lst,x,y,arr[x][y]);
+            add(lst,x,y,arr[x][y],Normal);
             /*if(!add(lst,x,y,arr[x][y])){//even if its the same value' need to insert it to the moves list
                 exit(0);
             }*/
@@ -88,7 +88,7 @@ void save(char *link,Board *board) {
         if (z == 0) {
             fix_error(arr, error, dimension, x, y, 0, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
-            add(lst,x,y,arr[x][y]);
+            add(lst,x,y,arr[x][y],Normal);
             /*if(!add(lst, x, y, arr[x][y]))// failed allocation
                 exit(0);*/
             arr[x][y] = 0;
@@ -97,7 +97,7 @@ void save(char *link,Board *board) {
         }
 //change condition here,error value is ok
       //  if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
-    add(lst,x,y,arr[x][y]);
+    add(lst,x,y,arr[x][y],Normal);
    /* if(!add(lst, x, y, arr[x][y]))
         exit(0);*/
     arr[x][y] = z;

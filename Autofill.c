@@ -50,11 +50,12 @@ void autofill(int **arr, int **fixed, int **error, int dimension, int row_per_bl
             }
         }
     }
-    count=0; //now will count successfull adds
+    //count=0; //now will count successfull adds
     for (row = 0; row < dimension; row++) {
         for (col = 0; col < dimension; col++) {
             if (temp[row][col] != 0) {
                 candidate = temp[row][col];
+                add(lst, row, col, arr[row][col],Autofill);
               /*  if(!add(lst, row, col, arr[row][col]))
                 {
                     printf("Look at autofill-wrong alloc case wasnt took care yet\n");
@@ -65,7 +66,7 @@ void autofill(int **arr, int **fixed, int **error, int dimension, int row_per_bl
                     free_arrays(temp,dimension);
                     exit(0);
                 }*/
-                count++;
+                //count++;
                 arr[row][col] = candidate;//add to memory?
                 fix_error(arr, error, dimension, row, col, candidate, row - row % row_per_block,
                           col - col % col_per_block, row_per_block, col_per_block);
