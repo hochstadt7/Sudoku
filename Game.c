@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "Board.h"
 #include "ValidBoard.h"
-#include "FileManager.h"
 #include "MainAux.h"
 /*give a hint to a value in a specified square*/
 void hint(int **arr,int **fixed,int **solution,int **error,int dimension, int y, int x) {
@@ -11,15 +10,15 @@ void hint(int **arr,int **fixed,int **solution,int **error,int dimension, int y,
         return;
     }
     if(fixed[x][y]==1){//specified cell is fixed
-        printf("Can't give a hint to a fixed cell\n");
+        printf("Can't give a hint to a fixed cell.\n");
         return;
     }
     if(arr[x][y]!=0){//specified cell is full
-        printf("Can't give a hint to a full cell");
+        printf("Can't give a hint to a full cell.\n");
         return;
     }
     //need to find if solvable using ilp and than:
-    printf("Hint: set cell to %d\n", solution[x][y]);
+    printf("Hint: set cell to %d.\n", solution[x][y]);
 
 }
 /*save the board in a new file in the specified link*/
@@ -33,7 +32,7 @@ void save(char *link,Board *board) {
     FILE *dest = NULL;
     dest = fopen(link, "w");
     if (dest == NULL) {
-        printf("Error in save");
+        printf("Error in save.\n");
         exit(0);
     }
     if (board->mode == Edit) {// in such a case all filled cells are fixed
@@ -74,27 +73,33 @@ void save(char *link,Board *board) {
     void set(int **arr, int **error, int dimension, int **fixed, int y, int x, int z, int row_per_block, int col_per_block,
         List *lst) {
         if(arr[x][y]==z){//if setting to same value before
+            add(lst,x,y,arr[x][y],Normal);
+            /*if(!add(lst,x,y,arr[x][y])){//even if its the same value' need to insert it to the moves list
+                exit(0);
+            }*/
             print_board(arr,fixed,error,dimension,row_per_block,col_per_block);
             return;
         }
-        if (fixed[x][y] == 1) {// can change in edit mode?
-            printf("Error: cell is fixed\n");
+        if (fixed[x][y] == 1) {// add condition-solve mode
+            printf("Error: cell is fixed.\n");
             return;
         }
 
         if (z == 0) {
             fix_error(arr, error, dimension, x, y, 0, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
-            if(!add(lst, x, y, arr[x][y]))// failed allocation
-                return;
+            add(lst,x,y,arr[x][y],Normal);
+            /*if(!add(lst, x, y, arr[x][y]))// failed allocation
+                exit(0);*/
             arr[x][y] = 0;
             print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
             return;
         }
 //change condition here,error value is ok
       //  if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
-    if(!add(lst, x, y, arr[x][y]))
-        return;
+    add(lst,x,y,arr[x][y],Normal);
+   /* if(!add(lst, x, y, arr[x][y]))
+        exit(0);*/
     arr[x][y] = z;
             fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block,
                       col_per_block);
@@ -105,62 +110,12 @@ void save(char *link,Board *board) {
             return;
         }*/
     }
-
+/*Sets the "mark errors" setting to X, where X is either 0 or 1*/
     void mark_errors(int mark, Board *board) {
         board->mark_error = mark;
     }
 
-    Board* edit(char *link,Board *old, enum status mode) {
-        Board *new=load(link,mode);
-        if(new!=NULL){//if edit didnt fail, free current board memory "forget him"
-            new->mode=Edit;
-            if(old!=NULL)
-        destroy_board(old);
-            initialize(new->arr,new->fixed,new->solution,new->error,new->dimension,new->row_per_block,new->col_per_block);
-        }
-        return new;
-    }
 
-
-    void autofill(int **arr, int **fixed, int **error, int dimension, int row_per_block, int col_per_block, List *lst) {
-        int row, col, num, count, candidate = 0;
-        int **temp;
-        if (is_errorneous(error, dimension)) {
-            printf("Can't autofill errorneous board.\n");
-            return;
-        }
-        temp=first_init(dimension);
-        for (row = 0; row < dimension; row++) {
-            for (col = 0; col < dimension; col++) {
-                if (arr[row][col] == 0) {
-                    count = 0;
-                    for (num = 1; num < dimension + 1; num++) {
-                        if (is_valid(arr, dimension, row, col, num, row_per_block, col_per_block)) {
-                            count++;
-                            candidate = num;
-                        }
-                    }
-                    if (count == 1) {
-                        temp[row][col] = candidate;
-                    }
-                }
-            }
-        }
-        for (row = 0; row < dimension; row++) {
-            for (col = 0; col < dimension; col++) {
-                if (temp[row][col] != 0) {
-                    candidate = temp[row][col];
-                    if(!add(lst, row, col, arr[row][col]))//allocation failed
-                        return;;
-                    arr[row][col] = candidate;//add to memory?
-                    fix_error(arr, error, dimension, row, col, candidate, row - row % row_per_block,
-                              col - col % col_per_block, row_per_block, col_per_block);
-                }
-            }
-        }
-        free_arrays(temp,dimension);
-        print_board(arr, fixed, error, dimension, row_per_block, col_per_block);
-    }
 
     void guess(int x,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
         if(is_errorneous(error,dimension))
@@ -170,6 +125,10 @@ void save(char *link,Board *board) {
         }
     }
 
-    /*void generate(int x,int y,int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
 
-    }*/
+
+    void exit_game(Board *board){
+        destroy_board(board);
+        printf("Exiting game...\n");
+        exit(0);
+    }

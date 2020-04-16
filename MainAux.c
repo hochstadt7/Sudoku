@@ -3,17 +3,21 @@
 #include "ValidBoard.h"
 /*initilaize the array*/
 int** first_init(int dimension) {
-    int i;
+    int i,j;
     int **arr=(int **) calloc(dimension , sizeof(int *));
     if(!arr)
     {
-        printf("first_init failed");
+        printf("first_init failed.\n");
         return NULL;
     }
     for (i = 0; i < dimension; i++) {
         arr[i] = (int *) calloc(dimension , sizeof(int));
         if (!arr[i] ) {
-            printf("first_init failed");
+            for(j=0; j<i; j++) {
+                free(arr[j]);
+            }
+            free(arr);
+            printf("first_init failed.\n");
             return NULL;
         }
     }
@@ -25,6 +29,7 @@ void free_arrays(int **arr,int dimension){
     for(index=0; index<dimension; index++) {
         free(arr[index]);
     }
+    free(arr);
 }
 /*make a copy of a given array*/
 void copy_arrays(int **copy, int**paste,int dimension)
@@ -50,17 +55,4 @@ int is_errorneous(int **error,int dimension){
     return 0;
 }
 
-void initialize(int **arr,int **fixed,int **solution,int **error,int dimension, int row_per_block,int col_per_block){
-    int index_row,index_col;
-//find_solution(); find solution using ILP
-for(index_row=0; index_row<dimension; index_row++ ){
-    for(index_col=0; index_col<dimension; index_col++){
-        if(arr[index_row][index_col]!=0) {
-            fix_error(arr, error, dimension, index_row, index_col, arr[index_row][index_col],
-                      index_row - index_row % row_per_block, index_col - index_col % col_per_block, row_per_block,col_per_block);
 
-        }
-    }
-
-}
-}

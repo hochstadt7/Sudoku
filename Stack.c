@@ -9,7 +9,7 @@
 Move *create_move(int row,int col,int value){
 Move *temp=(Move*)malloc(sizeof(Move));
 if(!temp) {
-    printf("Move alloc failed");
+    printf("Move alloc failed.\n");
     return NULL;
 }
 temp->row=row;
@@ -22,7 +22,7 @@ return temp;
 Stack* create_stack(){
     Stack *tmp=(Stack*)malloc(sizeof(Stack));
     if(!tmp){
-        printf("Stack allocation failed");
+        printf("Stack allocation failed.\n");
         return NULL;
     }
     tmp->top=NULL;
@@ -48,7 +48,7 @@ Move* top(Stack *memory){
 Move* push(Stack *memory,int row,int col,int value) {
     Move *new = create_move(row, col, value);
     if (!new){
-        printf("Stack allocation failed");
+        printf("Stack allocation failed.\n");
         return NULL;
     }
 
@@ -65,7 +65,7 @@ Move* push(Stack *memory,int row,int col,int value) {
 void print_stack(Stack *stk){
     Move *mov=(stk)->top;
     while (mov!=NULL){
-        printf("row=%d col=%d\n",mov->row,mov->col);
+        printf("row=%d col=%d.\n",mov->row,mov->col);
         mov=mov->next;
     }
 }

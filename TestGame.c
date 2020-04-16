@@ -12,23 +12,6 @@
 #include "Solve.h"
 #include "Stack.h"
 #include <assert.h>
+#include "Generate.h"
 
-void print_me(int **arr,int dimension)
-{
-    int index_row,index_col;
-    for(index_row=0; index_row<dimension; index_row++){
-        for(index_col=0; index_col<dimension; index_col++)
-        {
-            printf("%d ",arr[index_row][index_col]);
-        }
-        printf("\n");
-    }
-}
 
-void test_all() {
-
-    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\pelet",NULL,Solve);
-print_me(game->arr,game->dimension);
-  printf("%d", deter_solve(game->arr,game->error, game->dimension,game->row_per_block,game->col_per_block));
-printf("aa");
-}

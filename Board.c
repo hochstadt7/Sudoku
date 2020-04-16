@@ -7,52 +7,68 @@
 List *create_list() {
     List *tmp = (List *) malloc(sizeof(List));
     if(tmp==NULL){
-        printf("List allocation failed");
-        return NULL;
+        printf("List allocation failed.\n");
+        exit(0);
     }
     tmp->head = NULL;
     tmp->curr = NULL;
     return tmp;
 }
-Node* create_node(int row, int col,int val){
+Node* create_node(int row, int col,int val, enum sequence seq){
     Node *temp= (Node *) malloc(sizeof(Node));
     if(temp==NULL) {
-        printf("Node allocation failed");
-        return NULL;
+        printf("Node allocation failed.\n");
+        exit(0);
     }
-    temp->row=row;temp->col=col;temp->val=val;
+    temp->row=row;temp->col=col;temp->val=val;temp->seq=seq;
     temp->next=NULL;temp->prev=NULL;
     return temp;
 }
 
 /*add move to the move's list*/
-Node* add(List* lst,int row,int col,int val){
+Node* add(List* lst,int row,int col,int val, enum sequence seq){
     Node *tmp;
-    Node* node=create_node(row,col,val);
-    if(node==NULL) {
-        printf("Node allocation has failed\n");
-        return NULL;
-    }
+    Node* node=create_node(row,col,val,seq);
+    /*if(node==NULL) {
+        printf("Node allocation has failed.\n");
+        exit(0);//need acctually to end the game!?
+    }*/
     if(lst->head==NULL){
         lst->head=node;
         lst->curr=node;
     }
     else{
-        tmp=lst->curr->next; //all the redo part of the list need to be cleared (memory leak)
-        if(tmp!=NULL) {
-            while (tmp->next!=NULL) {
-                tmp=tmp->next;
-                free(tmp->prev);
+        if(lst->curr!=NULL) {// maybe curr is null!
+            tmp = lst->curr->next;
+            if (tmp != NULL) {//the redo part of the list is cleared
+                while (tmp->next != NULL) {
+                    tmp = tmp->next;
+                    free(tmp->prev);
+                }
+                free(tmp);
             }
-            free(tmp);
-        }
 
-        lst->curr->next=node;
-        node->prev=lst->curr;
-        lst->curr=lst->curr->next;
+            lst->curr->next = node;
+            node->prev = lst->curr;
+            lst->curr = lst->curr->next;
+        }
+        else{
+        tmp=lst->head;
+            if (tmp != NULL) {//the redo part of the list is cleared
+                while (tmp->next != NULL) {
+                    tmp = tmp->next;
+                    free(tmp->prev);
+                }
+                free(tmp);
+            }
+            lst->head=node;
+            lst->curr=node;
+        }
     }
     return node;
 }
+
+
 /*undo all moves*/
 void reset_list(int **arr,int**fixed,int **error,int dimension,int row_per_block,int col_per_block,List *lst){
     if(lst->head==NULL)
@@ -73,7 +89,8 @@ void free_lst(List *lst){
         free(lst);
         return;
     }
-    while (lst->curr->next!=NULL) {
+
+    while (lst->head->next!=NULL) {
         lst->head = lst->head->next;
         free(lst->head->prev);
     }
@@ -83,7 +100,7 @@ void free_lst(List *lst){
 void print_list(List *lst) {
     Node *tmp = lst->head;
     while (tmp != NULL) {
-        printf("row=%d col=%d value=%d\n", tmp->row, tmp->col,tmp->val);
+        printf("row=%d col=%d value=%d.\n", tmp->row, tmp->col,tmp->val);
         tmp = tmp->next;
     }
 }
@@ -91,43 +108,53 @@ void print_list(List *lst) {
 Board* create_board(int dimension,int row_per_block,int col_per_block){
 Board* board=(Board*) malloc(sizeof(Board));
 if(!board) {
-    printf("Create_board failed");
-    return NULL;
+    printf("Create_board failed.\n");
+    exit(0);
 }
 board->arr=first_init(dimension);
-if(board->arr==NULL) {
-    printf("Create_board failed");
+/*if(board->arr==NULL) {
+    printf("Create_board failed.\n");
     free(board);
-    return NULL;
-}
+    exit(0);
+}*/
 board->fixed=first_init(dimension);
-if(board->fixed==NULL)
+/*if(board->fixed==NULL)
 {
-    printf("Create_board failed");
-    free(board->arr);
+    printf("Create_board failed.\n");
+    free_arrays(board->arr,board->dimension);
     free(board);
-    return  NULL;
-}
+    exit(0);
+}*/
 board->solution=first_init(dimension);
-    if(board->solution==NULL)
+  /*  if(board->solution==NULL)
     {
-        printf("Create_board failed");
-        free(board->fixed);
-        free(board->arr);
+        printf("Create_board failed.\n");
+        free_arrays(board->fixed,board->dimension);
+        free_arrays(board->arr,board->dimension);
         free(board);
-        return NULL;
-    }
+        exit(0);
+    }*/
     board->error=first_init(dimension);
-    if(board->error==NULL)
+   /* if(board->error==NULL)
     {
-        printf("Create_board failed");
-        free(board->error);
-        free(board->fixed);
-        free(board->arr);
+        printf("Create_board failed.\n");
+       free_arrays(board->solution,board->dimension);
+        free_arrays(board->fixed,board->dimension);
+        free_arrays(board->arr,board->dimension);
         free(board);
-        return NULL;
-    }
+        exit(0);
+    }*/
     board->lst=create_list();
+   /* if(board->lst==NULL)
+    {
+        printf("Create_board failed.\n");
+        free_arrays(board->error,board->dimension);
+        free_arrays(board->solution,board->dimension);
+        free_arrays(board->fixed,board->dimension);
+        free_arrays(board->arr,board->dimension);
+        free(board);
+        exit(0);
+    }*/
    board->dimension=dimension;board->mark_error=0;board->is_over=0;
 board->row_per_block=row_per_block;
 board->col_per_block=col_per_block;
@@ -139,10 +166,10 @@ void destroy_board(Board* board){
     if(!board)
         return;
     free_lst(board->lst);
-    free(board->error);
-    free(board->solution);
-    free(board->fixed);
-    free(board->arr);
+    free_arrays(board->error,board->dimension);
+    free_arrays(board->solution,board->dimension);
+    free_arrays(board->fixed,board->dimension);
+    free_arrays(board->arr,board->dimension);
     free(board);
 }
 /*printing the board according to the specified format*/
@@ -179,43 +206,61 @@ void print_board(int **arr,int **fixed,int **error,int dimension,int row_per_blo
     for(index_block=0; index_block<num_dash; index_block++) {
         printf("-");
     }
-    //printf("\n");
+    printf("\n");
 }
 /*undo move*/
 void undo(int **arr,List *lst){
-    int temp;
+    int temp,special;
+
     if(lst->curr==NULL){//no move to undo
-        printf("Can't undo");
+        printf("Can't undo.\n");
         return;
     } else{
-        temp=arr[lst->curr->row][lst->curr->col];
-        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
-        printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
-        lst->curr->val=temp;
-        lst->curr=lst->curr->prev;
+        special=lst->curr->seq;
+        do {
+            temp = arr[lst->curr->row][lst->curr->col];
+            arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+            printf("Block in row %d, column %d was set to %d.\n", lst->curr->row+1, lst->curr->col+1, lst->curr->val);
+            lst->curr->val = temp;
+            lst->curr = lst->curr->prev;// may be null
+        }while (lst->curr!=NULL&&lst->curr->seq==special&&special!=Normal);//as part of autofill ,need to undo several moves
     }
 }
 /*redo move*/
 void redo(int **arr,List *lst) {
-    int temp;
-    if(lst->curr==NULL){
-        if(lst->head==NULL) {//no move to redo
-            printf("Can't redo");
+    int temp,special;
+    if(lst->curr==NULL) {
+        if (lst->head == NULL) {//no move to redo
+            printf("Can't redo.\n");
             return;
         }
-        lst->curr=lst->head;
-        temp=arr[lst->curr->row][lst->curr->col];
-        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
-        printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
-        lst->curr->val=temp;
+        lst->curr = lst->head;//problem to redo several moves
+        temp = arr[lst->curr->row][lst->curr->col];
+        arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+        printf("Block in row %d, column %d was set to %d.\n", lst->curr->row, lst->curr->col, lst->curr->val);
+        lst->curr->val = temp;
+        if (lst->curr->next == NULL)
+            return;
+        special = lst->curr->next->seq;
+        do {
+            lst->curr = lst->curr->next;
+            temp = arr[lst->curr->row][lst->curr->col];
+            arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+            printf("Block in row %d, column %d was set to %d.\n", lst->curr->row, lst->curr->col, lst->curr->val);
+            lst->curr->val = temp;
+
+        }while (lst->curr->next != NULL && lst->curr->next->seq == special&&special!=Normal);
 
     } else{
-    if(lst->curr->next==NULL){printf("Can't redo");return;}
-    lst->curr=lst->curr->next;
-        temp=arr[lst->curr->row][lst->curr->col];
-        arr[lst->curr->row][lst->curr->col]=lst->curr->val;
-        printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
-        lst->curr->val=temp;
+    if(lst->curr->next==NULL){printf("Can't redo.\n");return;}
+     special=lst->curr->next->seq;
+    do {
+        lst->curr = lst->curr->next;
+        temp = arr[lst->curr->row][lst->curr->col];
+        arr[lst->curr->row][lst->curr->col] = lst->curr->val;
+        printf("Block in row %d, column %d was set to %d.\n", lst->curr->row + 1, lst->curr->col + 1, lst->curr->val);
+        lst->curr->val = temp;
+    }while (lst->curr->next!=NULL&&lst->curr->next->seq==special&&special!=Normal);//as part of special command ,need to undo several moves
 
     }
 }

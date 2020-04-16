@@ -7,26 +7,37 @@
 #include "MainAux.h"
 
 
-/*count number of possible solutions for the given board*/
 int deter_solve(int **solution,int **error, int dimension, int row_per_block, int col_per_block) {
 if(is_errorneous(error,dimension))//board is erroneous- no solution
 {
-    printf("ffffff");
+    printf("No solution- board is errorneous.\n");
     return 0;
 }
-    Stack *stk = create_stack();
+    Stack *stk;
     Move *up;
     int  curr_row,curr_col,found_legal,count=0,is_sol=0;
     int **arr=first_init((dimension));
+    /*if(!arr){
+        return 0;
+    }*/
+    stk=create_stack();
+    /*if(!stk){
+        free_arrays(arr,dimension);
+        return 0;
+    }*/
     for(curr_row=0; curr_row<dimension; curr_row++) {//index unfilled cells
         for (curr_col = 0; curr_col < dimension; curr_col++) {
           if(solution[curr_row][curr_col]!=0)
               arr[curr_row][curr_col]=1;
         }
         }
-
-    if(!push(stk, 0, 0, 0))//aloccation failed
+    push(stk, 0, 0, 0);
+    /*if(!push(stk, 0, 0, 0))//aloccation failed
+    {
+        free_arrays(arr,dimension);
+        free_stack(stk);
         return 0;
+    }*/
     while (!is_empty(stk)) {
         up = stk->top;
         curr_row=up->row;
@@ -69,17 +80,29 @@ if(is_errorneous(error,dimension))//board is erroneous- no solution
                     }
                 }
                 else{
-                    if(!push(stk, curr_row+1, 0, 0))//move to the next cell
+                    push(stk, curr_row+1, 0, 0);
+                   /* if(!push(stk, curr_row+1, 0, 0))//move to the next cell
+                    {
+                        free_arrays(arr,dimension);
+                        free_stack(stk);
                         return 0;
+                    }*/
+
                 }
             }
             else{
-                if(!push(stk, curr_row, curr_col+1, 0))//backtracking
+                push(stk, curr_row, curr_col+1, 0);
+               /* if(!push(stk, curr_row, curr_col+1, 0))//backtracking
+                {
+                    free_arrays(arr,dimension);
+                    free_stack(stk);
                     return 0;
+                }*/
             }
             }
 
         }
+    free_arrays(arr,dimension);
     free_stack(stk);
     return count;
 }
