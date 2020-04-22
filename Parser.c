@@ -13,7 +13,7 @@
 #define INVALID_PARAM "Error: param format incorrect - please provide parameters of type %s\n"
 
 struct Command invalidMove = {
-        INVALID, {0}
+        INVALID, {0}, "", 0, 0
 };
 /*an object containing an enum indicating the selected command type*/
 /*and an array of all parameters relevant to the current command*/
@@ -39,7 +39,7 @@ struct CommandSyntax commands[COMMAND_COUNT] = {
         {"reset", 0, 0, PARAM_INT, 0, 1, 1, RESET},
         {"exit", 0, 0, PARAM_INT, 1, 1, 1, EXIT}
 };
-struct Command* get_next_command(enum gameModes mode){
+struct Command* get_next_command(enum gameMode mode){
     char str [MAX_COMMAND_LENGTH]; /* the input string*/
     char* command; /* the substring representing the command type*/
     char* param; /* the substring of the command representing the currently processed parameter;*/
@@ -53,7 +53,7 @@ struct Command* get_next_command(enum gameModes mode){
     int missingParams = 0; /* whether or not a sufficient*/
     int i = 0;
     char* test;
-    char* endptr = NULL; /* used to determine whether int/float params have been successfully cast */
+    char* endptr = NULL; /* used to determine whether int/float params have been successfuly cast */
     command = NULL;
     while(command==NULL){
         /*read command*/
@@ -69,7 +69,7 @@ struct Command* get_next_command(enum gameModes mode){
         }
         /* extract command */
         command = strtok(str, DELIMITER);
-        printf("test: string-%s", str);
+        /*printf("test: string-%s", str);*/
     }
     /*look for command in commands list*/
     for(i = 0; i < COMMAND_COUNT; i++){
@@ -80,9 +80,9 @@ struct Command* get_next_command(enum gameModes mode){
             paramType = commands[i].paramType;
             currMove.type = commands[i].type;
             isValidCommandType =
-                    (mode == MODEINIT && commands[i].initMode) ||
-                    (mode == MODEEDIT && commands[i].editMode) ||
-                    (mode == MODESOLVE && commands[i].solveMode);
+                    (mode == InitMode && commands[i].initMode) ||
+                    (mode == EditMode && commands[i].editMode) ||
+                    (mode == SolveMode && commands[i].solveMode);
             break;
         }
     }
@@ -108,7 +108,7 @@ struct Command* get_next_command(enum gameModes mode){
             currMove.int_params[i] = intParam;
         }
         if(paramType == PARAM_FLOAT){
-            floatParam = strtof(param, NULL);
+            floatParam = 0;/*strtof(param, NULL)*/;
             currMove.float_param = floatParam;
         }
         if(paramType == PARAM_BOOL){
@@ -135,22 +135,6 @@ struct Command* get_next_command(enum gameModes mode){
         return &invalidMove;
     }
     return &currMove;
-}
-
-int* get_move_int_params(struct Command* move){
-    return move->int_params;
-}
-
-float get_move_float_params(struct Command* move){
-    return move->float_param;
-}
-
-int get_move_bool_params(struct Command* move){
-    return move->bool_param;
-}
-
-char* get_move_str_params(struct Command* move){
-    return move->str_param;
 }
 
 int get_move_type(struct Command* move){
