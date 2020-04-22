@@ -1,8 +1,0 @@
-//
-// Created by LENOVO on 11/01/2020.
-//
-
-#ifndef BIGPROJECT_MANAGEMODE_H
-#define BIGPROJECT_MANAGEMODE_H
-
-#endif //BIGPROJECT_MANAGEMODE_H

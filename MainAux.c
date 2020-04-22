@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ValidBoard.h"
-/*initilaize the array*/
+#include "MainAux.h"
+/*initialize the array*/
 int** first_init(int dimension) {
     int i,j;
     int **arr=(int **) calloc(dimension , sizeof(int *));
@@ -31,8 +31,8 @@ void free_arrays(int **arr,int dimension){
     }
     free(arr);
 }
-/*make a copy of a given array*/
-void copy_arrays(int **copy, int**paste,int dimension)
+/*moves over values from one 2d array to another*/
+void copy_arrays(int **copy, int **paste,int dimension)
 {
     int index_row,index_col;
     for(index_row=0; index_row<dimension; index_row++){
@@ -41,10 +41,16 @@ void copy_arrays(int **copy, int**paste,int dimension)
             paste[index_row][index_col]=copy[index_row][index_col];
         }
     }
-
 }
-/*find wether the board is errorneous*/
-int is_errorneous(int **error,int dimension){
+/*returns a 2d array identical to the one provided */
+int** duplicateArray(int **arr, int dimension)
+{
+    int **copy = first_init(dimension);
+    copy_arrays(copy, arr, dimension);
+    return copy;
+}
+/*find whether the board is erroneous*/
+int is_erroneous(int **error,int dimension){
     int row,col;
     for(row=0; row<dimension; row++){
         for(col=0; col<dimension; col++){
@@ -55,4 +61,23 @@ int is_errorneous(int **error,int dimension){
     return 0;
 }
 
-
+void *init_malloc(int size, int length, enum variableType type){
+    int i;
+    void *arr = malloc(size*length);
+    for(i=0; i<length; i++){
+        switch(type){
+            case INT:
+                ((int*)arr)[i] = 0;
+                break;
+            case INT_POINTER:
+                ((int**)arr)[i] = NULL;
+                break;
+            case DOUBLE:
+                ((double*)arr)[i] = 0;
+                break;
+            default:
+                break;
+        }
+    }
+    return arr;
+}

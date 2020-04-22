@@ -1,10 +1,3 @@
-//
-// Created by LENOVO on 08/01/2020.
-//
-
-#include "MainAux.h"
-#include <stdio.h>
-#include <stdlib.h>
 /* validation of value in row */
 int in_row(const int *arr, int dimension, int value) {
     int index;
@@ -43,12 +36,14 @@ int is_valid(int **arr, int dimension, int row, int col, int value, int row_per_
     if (arr[row][col] == value) {
         return 1;
     }
-    if ((in_block(arr, row - row % row_per_block, col - col % col_per_block, value,row_per_block,col_per_block) || (in_row(arr[row],dimension,value)) || (in_col(arr,dimension, col, value)))) {
+    if ((in_block(arr, row - row % row_per_block, col - col % col_per_block, value,row_per_block,col_per_block)
+    || (in_row(arr[row],dimension,value))
+    || (in_col(arr,dimension, col, value)))) {
         return 0;
     }
     return 1;
 }
-/*set errorneous board values*/
+/*set erroneous board values*/
 void fix_error(int **arr,int **error,int dimension,int row,int col,int value, int block_start_row, int block_start_col,int row_per_block,int col_per_block){
     int index_row,index_col,add_or_remove,is_valid=1;
     add_or_remove=value==0?0:1;
@@ -66,19 +61,6 @@ void fix_error(int **arr,int **error,int dimension,int row,int col,int value, in
             }
         }
     }
-    if(add_or_remove&&!is_valid)// if we added errorneous
+    if(add_or_remove&&!is_valid)/* if we added erroneous */
         error[row][col]=1;
-}
-
-void validate(int **arr,int **fixed,int **error,int dimension,int row_per_block,int col_per_block){
-    int is_solvable;
-if(is_errorneous(error,dimension))
-{
-    printf("Validation can't be executed because board is errorneous.\n");
-    return;;
-}
-//is_solvable=ILP()
-if(is_solvable)
-    printf("The board was found to be solvable");
-else printf("The board wasn't found to be solvable");
 }

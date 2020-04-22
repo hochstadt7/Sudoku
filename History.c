@@ -1,9 +1,9 @@
-//
-// Created by LENOVO on 02/01/2020.
-//
+/**/
+/**/ Created by LENOVO on 02/01/2020.
+/**/
 #include <stdio.h>
 #include <stdlib.h>
-//#include "History.h"
+/*#include*/ "History.h"
 #include "Board.h"
 
 /*List *create_list() {
@@ -53,7 +53,7 @@ void undo(int **arr,List *lst){
         lst->curr=lst->curr->prev;
         arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
-    //print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
+    /*print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);*/
     printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
 }
 
@@ -65,7 +65,7 @@ void redo(int **arr,List *lst){
         lst->curr=lst->curr->next;
         arr[lst->curr->row][lst->curr->col]=lst->curr->val;
     }
-    //print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);
+    /*print_board(board->arr,board->fixed,board->error,board->dimension,board->row_per_block,board->col_per_block);*/
     printf("Block in row %d, column %d was set to %d.\n",lst->curr->row,lst->curr->col,lst->curr->val);
 }
 

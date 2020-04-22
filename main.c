@@ -1,19 +1,10 @@
 #include <stdio.h>
-#include <stdlib.h>
-//#include "Game.h"
-//#include "Board.h"
-#include "MainAux.h"
+#include "Parser.h"
 #include "Game.h"
-#include "FileManager.h"
 #include "ValidBoard.h"
-#define DIMENSION 9
-#define ROWPERBLOCK 3
-#define COLPERBLOCK 3
-#include "Solve.h"
-#include "Stack.h"
-#include "TestGame.h"
 #include "Autofill.h"
-//#include "History.h"
+#include "ILP.h"
+#include "Generate.h"
 
 void print_me(int **arr,int dimension)
 {
@@ -28,20 +19,74 @@ void print_me(int **arr,int dimension)
     printf("\n\n");
 }
 
-void test_all() {
-    Board *game2;
-    Board *game=edit("C:\\Users\\LENOVO\\Documents\\New folder\\type",NULL,Solve);
-    set(game->arr,game->error,game->dimension,game->fixed,2,1,4,game->row_per_block,game->col_per_block,game->lst);
-    autofill(game->arr,game->fixed,game->error,game->dimension,game->row_per_block,game->col_per_block,game->lst);
-    set(game->arr,game->error,game->dimension,game->fixed,2,1,5,game->row_per_block,game->col_per_block,game->lst);
-    undo(game->arr,game->lst);
-    undo(game->arr,game->lst);
-    redo(game->arr,game->lst);
-    print_me(game->arr,game->dimension);
-
-}
 int main() {
-test_all();
-printf("Winner.\n");
+    Board *game = create_board(1, 1, 1);
+    struct Command *currCommand;
+    int commandType;
+    /* run the game */
+    while (1) {
+        currCommand = get_next_command(game->mode);
+        commandType = get_move_type(currCommand);
+        if (get_move_type(currCommand) == 0) {
+            continue;
+        }
+        switch (commandType) {
+            case SOLVE:
+                solve(currCommand->str_param, game);
+                break;
+            case EDIT:
+                game=edit(currCommand->str_param, game);
+                break;
+            case MARK_ERRORS:
+                setMarkErrors(currCommand->bool_param, game);
+                break;
+            case PRINT_BOARD:
+                print_board(game);
+                break;
+            case SET:
+                /* x/y switch is deliberate*/
+                set(currCommand->int_params[1], currCommand->int_params[0], currCommand->int_params[2], game);
+                break;
+            case VALIDATE:
+                validate(game);
+                break;
+            case GUESS:
+                guess(currCommand->float_param, game);
+                break;
+            case GENERATE:
+                generate(currCommand->int_params[0], currCommand->int_params[1], game);
+                break;
+            case UNDO:
+                undo(game);
+                break;
+            case REDO:
+                redo(game);
+                break;
+            case SAVE:
+                save(currCommand->str_param, game);
+                break;
+            case HINT:
+                hint(currCommand->int_params[0], currCommand->int_params[1], game);
+                break;
+            case GUESSHINT:
+                break;
+            case NUMSOLUTIONS:
+                break;
+            case AUTOFILL:
+                autofill(game);
+                break;
+            case RESET:
+                calc(game);
+                break;
+            case EXIT:
+                exit_game(game);
+                return 0;
+                break;
+            case INVALID:
+            default:
+                break;
+        }
+        print_board(game);
+    }
     return 0;
 }

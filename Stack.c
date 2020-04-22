@@ -1,10 +1,6 @@
-//
-// Created by LENOVO on 02/01/2020.
-//
 #include <stdio.h>
 #include <stdlib.h>
 #include "Stack.h"
-
 
 Move *create_move(int row,int col,int value){
 Move *temp=(Move*)malloc(sizeof(Move));

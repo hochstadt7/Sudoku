@@ -1,13 +1,11 @@
-//
-// Created by LENOVO on 02/01/2020.
-//
-
 #ifndef BIGPROJECT_MAINAUX_H
 #define BIGPROJECT_MAINAUX_H
 
+enum variableType {INT=1, INT_POINTER=2, DOUBLE=3};
 int** first_init(int dimension);/*initialize board*/
+int** duplicateArray(int **arr, int dimension);
 void copy_arrays(int **copy, int**paste,int dimension);/*copy data of copy to paste*/
-int is_errorneous(int **error,int dimension);
-//void initialize(int **arr,int **fixed,int **solution,int **error,int dimension, int row_per_block,int col_per_block);
+int is_erroneous(int **error,int dimension);
 void free_arrays(int **arr,int dimension);
-#endif //BIGPROJECT_MAINAUX_H
+void *init_malloc(int size, int length, enum variableType type);
+#endif /*BIGPROJECT_MAINAUX_H*/
