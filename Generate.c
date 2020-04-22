@@ -122,7 +122,7 @@ void generate(int x, int y, Board *b) {
         if (!fill_x_cells(temp, x)) {/*failure in allocation/no legal value for some cells*/
             return;
         }
-        res = calc(temp);
+        res = calc(temp, BinaryVars, 1);
         if (!res || !res->valid) {
             iteration++;
             continue;

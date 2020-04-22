@@ -3,7 +3,6 @@
 
 /*status of game*/
 enum gameMode {InitMode=1, SolveMode=2, EditMode=3};
-enum sequence{Normal=0,Autofill=1,Generate=2,Guess=3};
 
 typedef struct node{
     int **arr;

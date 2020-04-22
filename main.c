@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "Parser.h"
 #include "Game.h"
-#include "ValidBoard.h"
 #include "Autofill.h"
 #include "ILP.h"
 #include "Generate.h"
@@ -89,7 +88,7 @@ int main() {
                 autofill(game);
                 break;
             case RESET:
-                calc(game);
+                calc(game, BinaryVars, 1);
                 break;
             case EXIT:
                 exit_game(game);

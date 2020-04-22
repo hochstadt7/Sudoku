@@ -27,7 +27,7 @@ void hint(int x, int y, Board *b) {
         printf("Can't give a hint to a full cell.\n");
         return;
     }
-    res = calc(b);
+    res = calc(b, BinaryVars, 1);
     if(res->valid)
         printf("Hint: set %d, %d to %d\n", x, y, res->solution->arr[x][y]);
     else printf("No valid solution was found\n");
@@ -210,7 +210,7 @@ void validate(Board *b){
         printf("Validation can't be executed because board is erroneous.\n");
         return;;
     }
-    res = calc(b);
+    res = calc(b, BinaryVars, 1);
     if(res->valid)
         printf("The board is solvable\n");
     else printf("No valid solution was found\n");
