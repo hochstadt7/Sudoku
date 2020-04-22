@@ -86,7 +86,7 @@ int main() {
             default:
                 break;
         }
-        /*print_board(game);*/
+        print_board(game);
     }
     return 0;
 }

@@ -179,6 +179,7 @@ Board* edit(char *link, Board *old) {
         /*not sure that this call should exist in edit mode*/
         /*check_fixed_cells_validity(new->arr,new->fixed,new->solution,new->error,new->dimension,new->row_per_block,new->col_per_block);*/
     }
+    add(new);
     return new;
 }
 
@@ -190,6 +191,7 @@ Board* solve(char *link, Board *old) {
         destroy_board(old);
         check_fixed_cells_validity(new);
     }
+    add(new);
     return new;
 }
 

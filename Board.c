@@ -188,7 +188,7 @@ void redo(Board* b) {
     lst = b->lst;
     if(lst->curr==NULL || lst->curr->next==NULL){
         /*no move to undo*/
-        printf("Nothing to undo.\n");
+        printf("Nothing to redo.\n");
         return;
     }
     lst->curr = lst->curr->next;
