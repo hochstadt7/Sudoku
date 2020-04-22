@@ -95,12 +95,14 @@ void set(int x, int y, int z, Board *b) {
     }
     x--;
     y--;
-    if(arr[x][y]==z){/*if setting to same value before*/
+    /*if setting to same value before*/
+    if(arr[x][y]==z){
         add(b);
         print_board(b);
         return;
     }
-    if (fixed[x][y] == 1) {/* add condition-solve mode*/
+
+    if (fixed[x][y] == 1 && b->mode == SolveMode) {
         printf("Error: cell is fixed.\n");
         return;
     }
@@ -113,12 +115,12 @@ void set(int x, int y, int z, Board *b) {
         print_board(b);
         return;
     }
-    /*change condition here,error value is ok*/
+
+    /*TODO: change condition here, error value is ok*/
     if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
-        add(b);
         arr[x][y] = z;
+        add(b);
         fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block, col_per_block);
-        print_board(b);
     }
 }
 

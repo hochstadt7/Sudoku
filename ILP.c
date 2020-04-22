@@ -8,7 +8,7 @@
 #include <string.h>
 #include <math.h>
 
-#define GUROBI 1
+#define GUROBI 0
 #if GUROBI
 
 #include "gurobi_c.h"

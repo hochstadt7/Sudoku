@@ -46,7 +46,7 @@ void copy_arrays(int **copy, int **paste,int dimension)
 int** duplicateArray(int **arr, int dimension)
 {
     int **copy = first_init(dimension);
-    copy_arrays(copy, arr, dimension);
+    copy_arrays(arr, copy, dimension);
     return copy;
 }
 /*find whether the board is erroneous*/

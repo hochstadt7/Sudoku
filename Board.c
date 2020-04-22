@@ -21,7 +21,7 @@ Node* create_node(Board* b){
         exit(0);
     }
     temp->arr = duplicateArray(b->arr, b->dimension);
-    temp->next=NULL;temp->prev=NULL;
+    temp->next=NULL; temp->prev=NULL;
     return temp;
 }
 
@@ -39,25 +39,20 @@ Node* add(Board *b){
             tmp = lst->curr->next;
             if (tmp != NULL) {/*the redo part of the list is cleared*/
                 while (tmp->next != NULL) {
+                    free(tmp->arr);
+                    free(tmp);
                     tmp = tmp->next;
-                    free(tmp->prev);
                 }
-                free(tmp);
+                if(tmp) {
+                    free(tmp->arr);
+                    free(tmp);
+                }
             }
-
             lst->curr->next = node;
             node->prev = lst->curr;
             lst->curr = lst->curr->next;
         }
         else{
-        tmp=lst->head;
-            if (tmp != NULL) {/*the redo part of the list is cleared*/
-                while (tmp->next != NULL) {
-                    tmp = tmp->next;
-                    free(tmp->prev);
-                }
-                free(tmp);
-            }
             lst->head=node;
             lst->curr=node;
         }

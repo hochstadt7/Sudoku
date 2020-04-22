@@ -13,7 +13,6 @@ typedef struct node{
 
 /*holder of moves's timeline*/
 typedef struct linked_list{
-    int row,col;
     Node *curr,*head;
 }List;
 
@@ -37,6 +36,5 @@ Board* create_board(int dimension,int row_per_block,int col_per_block);/* create
 Board* duplicateBoard(Board* b);/*creates a new board with an identical arr to a given board*/
 void destroy_board(Board* board);/*free memory allocated for board*/
 void print_board(Board* b);/*Prints the board to the user*/
-
 
 #endif /*BIGPROJECT_BOARD_H*/
