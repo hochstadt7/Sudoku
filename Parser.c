@@ -6,20 +6,11 @@
 
 #define DELIMITER " \t\r\n"
 #define COMMAND_COUNT 17
-#define MAX_COMMAND_LENGTH 256
 #define INVALID_COMMAND_ERROR "Error: invalid command\n"
 #define TOO_LONG_ERROR "Error: command too long - commands should be shorter than %d characters\n"
 #define TOO_MANY_PARAMS "Error: unexpected params - the %s command expects %d params\n"
 #define INVALID_PARAM "Error: param format incorrect - please provide parameters of type %s\n"
 
-struct Command invalidMove = {
-        INVALID, {0}, "", 0, 0
-};
-/*an object containing an enum indicating the selected command type*/
-/*and an array of all parameters relevant to the current command*/
-struct Command currMove = {
-        INVALID, {0}, "", 0.0f, 0
-};
 struct CommandSyntax commands[COMMAND_COUNT] = {
         {"solve", 1, 0, PARAM_STR,1, 1, 1, SOLVE},
         {"edit", 1, 1, PARAM_STR, 1, 1, 1, EDIT},
@@ -39,7 +30,7 @@ struct CommandSyntax commands[COMMAND_COUNT] = {
         {"reset", 0, 0, PARAM_INT, 0, 1, 1, RESET},
         {"exit", 0, 0, PARAM_INT, 1, 1, 1, EXIT}
 };
-struct Command* get_next_command(enum gameMode mode){
+void get_next_command(enum gameMode mode, struct Command* currMove){
     char str [MAX_COMMAND_LENGTH]; /* the input string*/
     char* command; /* the substring representing the command type*/
     char* param; /* the substring of the command representing the currently processed parameter;*/
@@ -52,20 +43,27 @@ struct Command* get_next_command(enum gameMode mode){
     int paramsOptional = 0;
     int missingParams = 0; /* whether or not a sufficient*/
     int i = 0;
-    char* test;
+    char* line;
     char* endptr = NULL; /* used to determine whether int/float params have been successfuly cast */
     command = NULL;
+    currMove -> float_param = 0;
+    currMove -> bool_param = 0;
+    currMove -> int_params[0] = 0;
+    currMove -> int_params[1] = 0;
+    currMove -> int_params[2] = 0;
+    currMove -> str_param = NULL;
     while(command==NULL){
         /*read command*/
-        test=fgets(str, MAX_COMMAND_LENGTH, stdin);
-        if( test == NULL || *test == '^'){
-            currMove.type=EXIT;
-            return &currMove;
+        line=fgets(str, MAX_COMMAND_LENGTH, stdin);
+        if( line == NULL || *line == '^'){
+            currMove->type=EXIT;
+            return;
         }
         /* notify user of command overflow */
         if(strlen(str) > MAX_COMMAND_LENGTH){
             printf(TOO_LONG_ERROR, MAX_COMMAND_LENGTH);
-            return &invalidMove;
+            currMove->type=INVALID;
+            return;
         }
         /* extract command */
         command = strtok(str, DELIMITER);
@@ -78,7 +76,7 @@ struct Command* get_next_command(enum gameMode mode){
             expectedParamCount = commands[i].parCount;
             paramsOptional = commands[i].paramsOptional;
             paramType = commands[i].paramType;
-            currMove.type = commands[i].type;
+            currMove->type = commands[i].type;
             isValidCommandType =
                     (mode == InitMode && commands[i].initMode) ||
                     (mode == EditMode && commands[i].editMode) ||
@@ -89,7 +87,8 @@ struct Command* get_next_command(enum gameMode mode){
     /*if the command is invalid - print an error*/
     if(!isValidCommandType){
         printf(INVALID_COMMAND_ERROR);
-        return &invalidMove;
+        currMove->type=INVALID;
+        return;
     }
     /*iterate through the supplied params (space delimited), parse them as integers, and add them to the command parameters array.*/
     for(i = 0; i < expectedParamCount; i++){
@@ -103,38 +102,41 @@ struct Command* get_next_command(enum gameMode mode){
             intParam = strtol(param, &endptr, 10);
             if(intParam == 0 && (errno != 0 || endptr == param)){
                 printf(INVALID_PARAM, "int");
-                return &invalidMove;
+                currMove->type=INVALID;
+                return;
             }
-            currMove.int_params[i] = intParam;
+            currMove->int_params[i] = intParam;
         }
         if(paramType == PARAM_FLOAT){
             floatParam = 0;/*strtof(param, NULL)*/;
-            currMove.float_param = floatParam;
+            currMove->float_param = floatParam;
         }
         if(paramType == PARAM_BOOL){
             boolParam = strtol(param, &endptr, 10);
             if((boolParam == 0 && (errno != 0 || endptr == param)) || boolParam < 0 || boolParam > 1){
                 printf(INVALID_PARAM, "boolean");
-                return &invalidMove;
+                currMove->type=INVALID;
+                return;
             }
-            currMove.bool_param = boolParam;
+            currMove->bool_param = boolParam;
         }
         if(paramType == PARAM_STR){
-            currMove.str_param = param;
+            currMove->str_param = param;
         }
     }
     /*if some of the required params are missing - print an error message*/
     if(missingParams){
         printf(INVALID_COMMAND_ERROR);
-        return &invalidMove;
+        currMove->type=INVALID;
+        return;
     }
     /*if unexpected parameters have been provided - print an error message*/
     param = strtok(NULL, DELIMITER);
     if(param != NULL){
         printf(TOO_MANY_PARAMS, command, expectedParamCount);
-        return &invalidMove;
+        currMove->type=INVALID;
+        return;
     }
-    return &currMove;
 }
 
 int get_move_type(struct Command* move){

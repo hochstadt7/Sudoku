@@ -1,6 +1,5 @@
 #include "ILP.h"
 #include "Board.h"
-#include "Autofill.h"
 #include "ValidBoard.h"
 #include "MainAux.h"
 #include <stdlib.h>
@@ -230,7 +229,6 @@ Response *calc(Board *src) {
 #endif
         }
     }
-#if 0
     /* limit each value to one appearance per row */
     /* iterate over rows */
     for (i = 0; i < dimension; i++) {
@@ -255,6 +253,7 @@ Response *calc(Board *src) {
         }
     }
 
+#if 0
     /* limit each value to one appearance per col */
     /* iterate over columns */
     for (j = 0; j < dimension; j++) {

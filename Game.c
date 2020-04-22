@@ -38,14 +38,14 @@ void hint(int x, int y, Board *b) {
 void save(char *link, Board *board) {
     int index_row, index_col;
     FILE *dest = NULL;
-    /*check if board is erroneous, and in edit mode or not solvable (need to add not solvable condition after implemnting ilp)*/
+    /*check if board is erroneous, andin edit mode or not solvable (need to add not solvable condition after implemnting ilp)*/
     if (board->mode == EditMode && is_erroneous(board->error, board->dimension)) {
-        printf("In edit mode erroneous boards may not be saved.\n");
+        printf("erroneous boards may not be saved in 'edit' mode.\n");
         return;
     }
     dest = fopen(link, "w");
     if (dest == NULL) {
-        printf("Error in save.\n");
+        printf("Invalid filepath.\n");
         exit(0);
     }
     if (board->mode == EditMode) {/* in such a case all filled cells are fixed*/

@@ -1,10 +1,13 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "Parser.h"
 #include "Game.h"
 #include "ValidBoard.h"
 #include "Autofill.h"
 #include "ILP.h"
 #include "Generate.h"
+#include "Solve.h"
 
 void print_me(int **arr,int dimension)
 {
@@ -21,21 +24,30 @@ void print_me(int **arr,int dimension)
 
 int main() {
     Board *game = create_board(1, 1, 1);
-    struct Command *currCommand;
+    struct Command currCommandObj = {
+            INVALID, {0}, "", 0.0f, 0
+    };
+    struct Command *currCommand = &currCommandObj;
     int commandType;
+    char str[MAX_COMMAND_LENGTH];
     /* run the game */
     while (1) {
-        currCommand = get_next_command(game->mode);
+        get_next_command(game->mode, currCommand);
         commandType = get_move_type(currCommand);
+        /*no idea why this is necessary, but the string param gets corrupted otherwise*/
+        if(currCommand->str_param == NULL)
+            str[0]='\0';
+        else
+            strcpy(str, currCommand->str_param);
         if (get_move_type(currCommand) == 0) {
             continue;
         }
         switch (commandType) {
             case SOLVE:
-                solve(currCommand->str_param, game);
+                solve(str, game);
                 break;
             case EDIT:
-                game=edit(currCommand->str_param, game);
+                game=edit(str, game);
                 break;
             case MARK_ERRORS:
                 setMarkErrors(currCommand->bool_param, game);
@@ -63,7 +75,7 @@ int main() {
                 redo(game);
                 break;
             case SAVE:
-                save(currCommand->str_param, game);
+                save(str, game);
                 break;
             case HINT:
                 hint(currCommand->int_params[0], currCommand->int_params[1], game);
@@ -71,6 +83,7 @@ int main() {
             case GUESSHINT:
                 break;
             case NUMSOLUTIONS:
+                deter_solve(game->arr, game->error, game->dimension, game->row_per_block, game->col_per_block);
                 break;
             case AUTOFILL:
                 autofill(game);

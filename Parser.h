@@ -1,6 +1,7 @@
 #ifndef BIGPROJECT_PARSER_H
 #define BIGPROJECT_PARSER_H
 #include "Board.h"
+#define MAX_COMMAND_LENGTH 256
 enum commandTypes {
     SOLVE=1, EDIT=2, MARK_ERRORS=3, PRINT_BOARD=4,
     SET=5, VALIDATE=6, GUESS=7, GENERATE=8,
@@ -28,7 +29,7 @@ typedef struct Command{
     float float_param;
     int bool_param;
 }Command;
-Command* get_next_command(enum gameMode mode);
+void get_next_command(enum gameMode mode, struct Command* move);
 int* get_move_int_params(struct Command* move);
 float get_move_float_params(struct Command* move);
 int get_move_bool_params(struct Command* move);
