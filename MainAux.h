@@ -1,6 +1,6 @@
 #ifndef BIGPROJECT_MAINAUX_H
 #define BIGPROJECT_MAINAUX_H
-#define DEBUG 1
+#define DEBUG 0
 
 enum variableType {INT=1, INT_POINTER=2, DOUBLE=3};
 int ping(int p);

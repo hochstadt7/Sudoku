@@ -412,11 +412,9 @@ Response *calc(Board *src, enum LPMode mode) {
         }
     }
 #if DEBUG
-    printf("variables addignments: \n");
-
+    printf("variables assignments: \n");
     for (i = 0; i < varCount; i++)
         printf("%f ", solution[i]);
-
     printf("\n\n");
 #endif
     return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType,
@@ -451,7 +449,6 @@ void guessLP(Board *b, double threshold) {
     }
     dimension = b->dimension;
     solution = res->solution;
-    printf("\n\n\n\n THRESHOLD: %f \n\n\n\n\n", threshold);
     /* iterate over rows */
     for (i = 0; i < dimension; i++) {
         /* iterate over columns */
@@ -462,8 +459,6 @@ void guessLP(Board *b, double threshold) {
                     printf("val %d in cell %d,%d got assigned probabilty %f", v, i, j,
                            solution[(i * dimension * dimension) + (j * dimension) + v]);
                     if (solution[(i * dimension * dimension) + (j * dimension) + v] >= threshold) {
-                        printf("%f ----- THRESHOLD: %f", solution[(i * dimension * dimension) + (j * dimension) + v],
-                               threshold);
                         b->arr[i][j] = v + 1;
                     }
                 }
