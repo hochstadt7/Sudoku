@@ -79,6 +79,10 @@ void reset_list(Board* b){
 }
 /*free list resources*/
 void free_lst(List *lst){
+    if(lst==NULL)
+    {
+        return;
+    }
     if(lst->head==NULL)
     {
         free(lst);
@@ -113,9 +117,13 @@ void destroy_board(Board* board){
     if(!board)
         return;
     free_lst(board->lst);
+    board->lst = NULL;
     free_arrays(board->error,board->dimension);
+    board->error = NULL;
     free_arrays(board->fixed,board->dimension);
+    board->fixed = NULL;
     free_arrays(board->arr,board->dimension);
+    board->arr = NULL;
     free(board);
 }
 /*printing the board according to the specified format*/

@@ -37,6 +37,8 @@ int** first_init(int dimension) {
 /*free array resources*/
 void free_arrays(int **arr,int dimension){
     int index;
+    if(arr == NULL)
+        return;
     for(index=0; index<dimension; index++) {
         free(arr[index]);
     }
