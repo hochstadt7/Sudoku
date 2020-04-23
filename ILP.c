@@ -374,13 +374,14 @@ Response *calc(Board *src, enum LPMode mode) {
     }
 
 
+#if DEBUG
     /* Write model to 'sudoku.lp' */
     error = GRBwrite(model, "sudoku.lp");
     if (error) {
         return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars,
                     vType, solution, dimension);
     }
-
+#endif
     /* Capture solution information */
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimStatus);
     if (error || optimStatus == GRB_INF_OR_UNBD) {

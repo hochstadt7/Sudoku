@@ -99,6 +99,7 @@ void get_next_command(enum gameMode mode, struct Command* currMove){
             break;
         }
         if(paramType == PARAM_INT){
+            errno = 0;
             intParam = strtol(param, &endptr, 10);
             if(intParam == 0 && (errno != 0 || endptr == param)){
                 printf(INVALID_PARAM, "int");
@@ -113,6 +114,7 @@ void get_next_command(enum gameMode mode, struct Command* currMove){
         }
         if(paramType == PARAM_BOOL){
             boolParam = strtol(param, &endptr, 10);
+            errno = 0;
             if((boolParam == 0 && (errno != 0 || endptr == param)) || boolParam < 0 || boolParam > 1){
                 printf(INVALID_PARAM, "boolean");
                 currMove->type=INVALID;

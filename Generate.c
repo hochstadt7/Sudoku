@@ -85,7 +85,6 @@ int keep_y_cells(Board *b, int y) {
     int **arr;
     arr = b->arr;
     dimension = b->dimension;
-    print_board(b);
     while(alreadyUnsetCount<(dimension * dimension) - y){
         random = rand() % (dimension * dimension);
         row = random / dimension;
@@ -133,7 +132,7 @@ void generate(int x, int y, Board *b) {
         if (!keep_y_cells(temp, y))/*failure in allocation*/
             return;
         copy_arrays(temp->arr, b->arr, dimension);
-        add(temp);
+        add(b);
         destroy_board(temp);
         print_board(b);
         return;
