@@ -37,7 +37,7 @@ void hint(int x, int y, Board *b) {
     }
     res = hintLP(b, x, y);
     if(res>0)
-        printf("Hint: set %d, %d to %d\n", y, x, res);
+        printf("Hint: set %d, %d to %d\n", y+1, x+1, res);
     else printf("No valid solution was found\n");
 }
 void guesshint(int x, int y, Board *b) {

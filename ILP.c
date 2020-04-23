@@ -227,13 +227,20 @@ Response *calc(Board *src, enum LPMode mode) {
                     vType, solution, dimension);
     }
 
+
+    /* Disable Logging */
+    error = GRBsetintparam(env, GRB_IntParam_OutputFlag, 0);
+    if (error) {
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars,
+                    vType, solution, dimension);
+    }
+
     /* Create new model */
     error = GRBnewmodel(env, &model, "sudoku", varCount, target, NULL, NULL, vType, NULL);
     if (error) {
         return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars,
                     vType, solution, dimension);
     }
-
 #endif
     /*-----------CONSTRAINTS-----------*/
     /* for the LP case add constraints to each variable, limiting it to a 0 to 1 range */
