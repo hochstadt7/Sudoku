@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define GUROBI 1
+#define GUROBI 0
 #define SUPPRESS 0
 #define NON_FEASIBLE "No feasible solution was found\n"
 #if GUROBI
@@ -131,7 +131,7 @@ Response *calc(Board *src, enum LPMode mode) {
     GRBmodel *model = NULL;
 #endif
     int *ind; /* should be of size dimension*dimension*dimension */
-    double *val; /* should be of size dimension */
+    double *val, *target; /* should be of size dimension */
     int ***rowVars; /* indices of variables, indexed by row and value */
     int ***colVars; /* indices of variables, indexed by col and value */
     int ***blockVars; /* indices of variables, indexed by block and value */
@@ -156,6 +156,7 @@ Response *calc(Board *src, enum LPMode mode) {
 
     /*array allocation*/
     ind = init_malloc(sizeof(int), (dimension * dimension * dimension), INT);
+    target = init_malloc(sizeof(double), (dimension * dimension * dimension), INT);
     val = init_malloc(sizeof(double), (dimension * dimension * dimension), DOUBLE);
     cellVars = init_malloc(sizeof(int *), dimension * dimension, INT_POINTER);
     rowVars = init_malloc(sizeof(int *), dimension, INT_POINTER);
@@ -202,6 +203,7 @@ Response *calc(Board *src, enum LPMode mode) {
                     rowVars[i][v][j] = varCount;
                     colVars[j][v][i] = varCount;
                     blockVars[blockIndex][v][indexInBlock] = varCount;
+                    target[varCount] = mode == BinaryVars ? 0 : rand() % (dimension*dimension);
                     varCount++;
                 } else {
                     cellVars[i * dimension + j][v] = -1;
@@ -230,7 +232,7 @@ Response *calc(Board *src, enum LPMode mode) {
     }
 
     /* Create new model */
-    error = GRBnewmodel(env, &model, "sudoku", varCount, NULL, NULL, NULL, vType, NULL);
+    error = GRBnewmodel(env, &model, "sudoku", varCount, target, NULL, NULL, vType, NULL);
     if (error) {
         return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
@@ -409,7 +411,14 @@ Response *calc(Board *src, enum LPMode mode) {
             }
         }
     }
+#if DEBUG
+    printf("variables addignments: \n");
 
+    for (i = 0; i < varCount; i++)
+        printf("%f ", solution[i]);
+
+    printf("\n\n");
+#endif
     ping(2000);
     return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
 #endif
@@ -442,6 +451,7 @@ void guessLP(Board *b, double threshold){
     }
     dimension = b->dimension;
     solution = res->solution;
+    printf("\n\n\n\n THRESHOLD: %f \n\n\n\n\n", threshold);
     /* iterate over rows */
     for (i = 0; i < dimension; i++) {
         /* iterate over columns */
@@ -449,7 +459,9 @@ void guessLP(Board *b, double threshold){
             /* iterate over values */
             for (v = 0; v < dimension; v++) {
                 if (solution[(i * dimension * dimension) + (j * dimension) + v] != -1) {
+                    printf("val %d in cell %d,%d got assigned probabilty %f", v, i, j, solution[(i * dimension * dimension) + (j * dimension) + v]);
                     if(solution[(i * dimension * dimension) + (j * dimension) + v]>=threshold){
+                        printf("%f ----- THRESHOLD: %f", solution[(i * dimension * dimension) + (j * dimension) + v], threshold);
                         b->arr[i][j] = v+1;
                     }
                 }

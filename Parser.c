@@ -108,7 +108,7 @@ void get_next_command(enum gameMode mode, struct Command* currMove){
             currMove->int_params[i] = intParam;
         }
         if(paramType == PARAM_FLOAT){
-            floatParam = 0;/*strtof(param, NULL)*/;
+            floatParam = strtof(param, NULL);
             currMove->float_param = floatParam;
         }
         if(paramType == PARAM_BOOL){

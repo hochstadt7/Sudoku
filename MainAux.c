@@ -92,3 +92,16 @@ void *init_malloc(int size, int length, enum variableType type){
     }
     return arr;
 }
+
+void print_arr(int **arr,int dimension)
+{
+    int index_row,index_col;
+    for(index_row=0; index_row<dimension; index_row++){
+        for(index_col=0; index_col<dimension; index_col++)
+        {
+            printf("%d ",arr[index_row][index_col]);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+}

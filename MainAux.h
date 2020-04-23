@@ -10,4 +10,5 @@ void copy_arrays(int **copy, int**paste,int dimension);/*copy data of copy to pa
 int is_erroneous(int **error,int dimension);
 void free_arrays(int **arr,int dimension);
 void *init_malloc(int size, int length, enum variableType type);
+void print_arr(int **arr,int dimension);
 #endif /*BIGPROJECT_MAINAUX_H*/
