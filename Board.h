@@ -32,9 +32,6 @@ typedef struct board{
 List *create_list();/*create the timeline of moves*/
 Node* create_node(Board* b);/* create holder for row,column,value*/
 Node* add(Board* b);/*add last move to the moves timeline*/
-void undo(Board* b);/*Undo a previous move done by the user*/
-void redo(Board* b);/*Redo a move previously undone by the user*/
-void reset_list(Board* b);/*Undo all moves, reverting the board to its original loaded state*/
 
 Board* create_board(int dimension,int row_per_block,int col_per_block);/* create board game*/
 Board* duplicateBoard(Board* b);/*creates a new board with an identical arr to a given board*/

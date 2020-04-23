@@ -17,6 +17,12 @@ void hint(int x, int y, Board *b) {
     arr = b->arr;
     fixed = b->fixed;
     error = b->error;
+    if(x<0 || y<0 || x>dimension || y>dimension){
+        printf("Error: the provided parameters are out of bounds.\n");
+        return;
+    }
+    x--;
+    y--;
     if(is_erroneous(error,dimension)) {/*board is erroneous*/
         printf("You can't get a hint from an erroneous board\n");
         return;
@@ -31,8 +37,35 @@ void hint(int x, int y, Board *b) {
     }
     res = hintLP(b, x, y);
     if(res>0)
-        printf("Hint: set %d, %d to %d\n", x, y, res);
+        printf("Hint: set %d, %d to %d\n", y, x, res);
     else printf("No valid solution was found\n");
+}
+void guesshint(int x, int y, Board *b) {
+    int **arr, **fixed, **error;
+    int dimension;
+    dimension = b->dimension;
+    arr = b->arr;
+    fixed = b->fixed;
+    error = b->error;
+    if(x<0 || y<0 || x>dimension || y>dimension){
+        printf("Error: the provided parameters are out of bounds.\n");
+        return;
+    }
+    x--;
+    y--;
+    if(is_erroneous(error,dimension)) {/*board is erroneous*/
+        printf("You can't get a hint from an erroneous board\n");
+        return;
+    }
+    if(fixed[x][y]==1){/*specified cell is fixed*/
+        printf("Can't give a hint to a fixed cell.\n");
+        return;
+    }
+    if(arr[x][y]!=0){/*specified cell is full*/
+        printf("Can't give a hint to a full cell.\n");
+        return;
+    }
+    guessHintLP(b, x, y);
 }
 /*save the board in a new file in the specified link*/
 void save(char *link, Board *board) {
@@ -78,7 +111,7 @@ void save(char *link, Board *board) {
         fclose(dest);
 }
 
-/* set block to input value if value is legal*/
+/* set block to input value if value is legal */
 void set(int x, int y, int z, Board *b) {
     int **arr, **fixed, **error;
     int dimension, row_per_block, col_per_block;
@@ -219,4 +252,55 @@ void validate(Board *b){
     if(res)
         printf("The board is solvable\n");
     else printf("No valid solution was found\n");
+}
+
+
+/*undo move*/
+void undo(Board* b){
+    int **arr;
+    List *lst;
+    arr = b->arr;
+    lst = b->lst;
+
+    if(lst->curr==NULL || lst->curr->prev==NULL){
+        /*no move to undo*/
+        printf("Nothing to undo.\n");
+        return;
+    }
+    lst->curr = lst->curr->prev;
+    copy_arrays(lst->curr->arr, arr, b->dimension);
+    reCalcErrors(b);
+    print_board(b);
+}
+/*redo move*/
+void redo(Board* b) {
+    int **arr;
+    List *lst;
+    arr = b->arr;
+    lst = b->lst;
+    if(lst->curr==NULL || lst->curr->next==NULL){
+        /*no move to undo*/
+        printf("Nothing to redo.\n");
+        return;
+    }
+    lst->curr = lst->curr->next;
+    copy_arrays(lst->curr->arr, arr, b->dimension);
+    reCalcErrors(b);
+    print_board(b);
+}
+void reset_list(Board* b){
+    /*undo all moves*/
+    int **arr;
+    List *lst;
+    arr = b->arr;
+    lst = b->lst;
+    if(lst->head==NULL)
+        return;
+    while (lst->curr->prev!=NULL)
+    {
+        lst->curr=lst->curr->prev;
+    }
+    copy_arrays(lst->curr->arr, arr, b->dimension);
+    reCalcErrors(b);
+    print_board(b);
 }

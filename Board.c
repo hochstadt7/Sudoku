@@ -59,22 +59,6 @@ Node* add(Board *b){
     return node;
 }
 
-
-void reset_list(Board* b){
-    /*undo all moves*/
-    int **arr;
-    List *lst;
-    arr = b->arr;
-    lst = b->lst;
-    if(lst->head==NULL)
-        return;
-    while (lst->curr->prev!=NULL)
-    {
-        lst->curr=lst->curr->prev;
-    }
-    copy_arrays(lst->curr->arr, arr, b->dimension);
-    print_board(b);
-}
 /*free list resources*/
 void free_lst(List *lst){
     if(lst==NULL)
@@ -169,37 +153,6 @@ void print_board(Board* b){
         printf("-");
     }
     printf("\n");
-}
-/*undo move*/
-void undo(Board* b){
-    int **arr;
-    List *lst;
-    arr = b->arr;
-    lst = b->lst;
-
-    if(lst->curr==NULL || lst->curr->prev==NULL){
-        /*no move to undo*/
-        printf("Nothing to undo.\n");
-        return;
-    }
-    lst->curr = lst->curr->prev;
-    copy_arrays(lst->curr->arr, arr, b->dimension);
-    print_board(b);
-}
-/*redo move*/
-void redo(Board* b) {
-    int **arr;
-    List *lst;
-    arr = b->arr;
-    lst = b->lst;
-    if(lst->curr==NULL || lst->curr->next==NULL){
-        /*no move to undo*/
-        printf("Nothing to redo.\n");
-        return;
-    }
-    lst->curr = lst->curr->next;
-    copy_arrays(lst->curr->arr, arr, b->dimension);
-    print_board(b);
 }
 Board* duplicateBoard(Board* b){
     int dimension, row_per_block, col_per_block, i, j;

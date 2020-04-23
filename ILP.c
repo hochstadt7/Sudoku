@@ -555,7 +555,7 @@ void guessHintLP(Board *b, int x, int y) {
     /* iterate over rows */
     for (v = 0; v < dimension; v++) {
         if (solution[(x * dimension * dimension) + (y * dimension) + v] > 0) {
-            printf("cell [%d, %d] has value %d with certainty %f\n", x + 1, y + 1, v + 1,
+            printf("cell [%d, %d] has value %d with certainty %f\n", y + 1, x + 1, v + 1,
                    solution[(x * dimension * dimension) + (y * dimension) + v]);
         }
     }

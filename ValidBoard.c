@@ -1,4 +1,7 @@
 /* validation of value in row */
+#include "ValidBoard.h"
+#include "Board.h"
+
 int in_row(const int *arr, int dimension, int value) {
     int index;
     for (index = 0; index < dimension; index++) {
@@ -63,4 +66,25 @@ void fix_error(int **arr,int **error,int dimension,int row,int col,int value, in
     }
     if(add_or_remove&&!is_valid)/* if we added erroneous */
         error[row][col]=1;
+}
+
+
+void reCalcErrors(Board *b){
+    int **arr, **error;
+    int dimension, row_per_block, col_per_block;
+    int index_row, index_col;
+    dimension = b->dimension;
+    row_per_block = b->row_per_block;
+    col_per_block = b->col_per_block;
+    arr = b->arr;
+    error = b->error;
+    for(index_row=0; index_row<dimension; index_row++ ){
+        for(index_col=0; index_col<dimension; index_col++){
+            if(arr[index_row][index_col]!=0) {
+                fix_error(arr, error, dimension, index_row, index_col, arr[index_row][index_col],
+                          index_row - index_row % row_per_block, index_col - index_col % col_per_block, row_per_block,col_per_block);
+            }
+        }
+
+    }
 }

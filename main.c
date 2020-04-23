@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Parser.h"
-#include "ILP.h"
 #include "Game.h"
 #include "Autofill.h"
 #include "MainAux.h"
@@ -70,7 +69,7 @@ int main() {
                 hint(currCommand->int_params[1], currCommand->int_params[0], game);
                 break;
             case GUESSHINT:
-                guessHintLP(game, currCommand->int_params[1], currCommand->int_params[0]);
+                guesshint(currCommand->int_params[1], currCommand->int_params[0], game);
                 break;
             case NUMSOLUTIONS:
                 deter_solve(game->arr, game->error, game->dimension, game->row_per_block, game->col_per_block);
