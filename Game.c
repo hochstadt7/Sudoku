@@ -121,7 +121,7 @@ void set(int x, int y, int z, Board *b) {
     arr = b->arr;
     fixed = b->fixed;
     error = b->error;
-    if(x<0 || y<0 || z<1 || x>dimension || y>dimension || z>(dimension+1)){
+    if(x<0 || y<0 || z<0 || x>dimension || y>dimension || z>(dimension+1)){
         printf("Error: the provided parameters are out of bounds.\n");
         return;
     }
@@ -170,7 +170,6 @@ void guess(float threshold, Board *b){
     }
     guessLP(b, threshold);
     print_board(b);
-    printf("%f",threshold);
 }
 
 void exit_game(Board *board){

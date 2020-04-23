@@ -19,6 +19,7 @@ int main() {
     int commandType;
     char str[MAX_COMMAND_LENGTH];
     /* run the game */
+    printf("Welcome, we hope you enjoy our sudoku game. Please input a command\n");
     while (1) {
         get_next_command(game->mode, currCommand);
         commandType = get_move_type(currCommand);

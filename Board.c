@@ -88,7 +88,7 @@ Board* create_board(int dimension,int row_per_block,int col_per_block){
     board->fixed=first_init(dimension);
     board->error=first_init(dimension);
     board->lst=create_list();
-    board->dimension=dimension;board->mark_errors=0;
+    board->dimension=dimension;board->mark_errors=1;
     board->row_per_block=row_per_block;
     board->col_per_block=col_per_block;
     board->mode=InitMode;

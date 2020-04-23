@@ -19,10 +19,10 @@ void autofill(Board *b) {
     temp=duplicateBoard(b);
     for (row = 0; row < dimension; row++) {
         for (col = 0; col < dimension; col++) {
+            count = 0;
             if (arr[row][col] == 0) {
-                count = 0;
                 for (num = 1; num < dimension + 1; num++) {
-                    if (is_valid(arr,dimension,row,col,arr[row][col],row_per_block,col_per_block)) {
+                    if (is_valid(arr,dimension,row,col,num,row_per_block,col_per_block)) {
                         count++;
                         candidate = num;
                     }

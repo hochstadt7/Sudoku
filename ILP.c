@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define GUROBI 1
+#define GUROBI 0
 #define SUPPRESS 0
 #define NON_FEASIBLE "No feasible solution was found\n"
 #if GUROBI
@@ -227,16 +227,15 @@ Response *calc(Board *src, enum LPMode mode) {
                     vType, solution, dimension);
     }
 
-
-    /* Disable Logging */
-    error = GRBsetintparam(env, GRB_IntParam_OutputFlag, 0);
+    /* Create new model */
+    error = GRBnewmodel(env, &model, "sudoku", varCount, target, NULL, NULL, vType, NULL);
     if (error) {
         return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars,
                     vType, solution, dimension);
     }
 
-    /* Create new model */
-    error = GRBnewmodel(env, &model, "sudoku", varCount, target, NULL, NULL, vType, NULL);
+    /* Disable Logging */
+    error = GRBsetintparam(env, "OutputFlag", 0);
     if (error) {
         return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars,
                     vType, solution, dimension);
@@ -463,8 +462,6 @@ void guessLP(Board *b, double threshold) {
             /* iterate over values */
             for (v = 0; v < dimension; v++) {
                 if (solution[(i * dimension * dimension) + (j * dimension) + v] != -1) {
-                    printf("val %d in cell %d,%d got assigned probabilty %f", v, i, j,
-                           solution[(i * dimension * dimension) + (j * dimension) + v]);
                     if (solution[(i * dimension * dimension) + (j * dimension) + v] >= threshold) {
                         b->arr[i][j] = v + 1;
                     }
