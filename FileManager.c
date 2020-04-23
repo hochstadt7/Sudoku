@@ -7,11 +7,10 @@
 #define ROW 250
 #define DELIMITER " \t\r\n"
 
+/*the file manager module contains functions related to the loading and saving of board to files*/
 int fixed_are_valid(int **arr,int **fixed,int dimension,int row_per_block,int col_per_block){
     int row,col;
     int **temp=first_init(dimension);
-    /*if(!temp)
-        exit(0);*/
     for(row=0; row<dimension; row++){
         for(col=0; col<dimension; col++){
             if(fixed[row][col]==1){
@@ -27,6 +26,7 @@ int fixed_are_valid(int **arr,int **fixed,int dimension,int row_per_block,int co
     return 1;
 }
 
+/*prints error if the file's format is incorrect, and cleanup*/
 Board* un_format(FILE *dest){
     printf("File isn't in correct form.\n");
     fclose(dest);

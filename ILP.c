@@ -5,15 +5,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 #define GUROBI 1
-#define DEBUG 1
+#define SUPPRESS 0
+#define NON_FEASIBLE "No feasible solution was found\n"
 #if GUROBI
 
 #include "gurobi_c.h"
 
 #endif
+
+int floorToInt(double x){
+    int cast = (int)x;
+    return cast <= x ? cast : cast -1;
+}
 
 Board *get_autofilled(Board *b) {
     int **arr;
@@ -44,58 +49,83 @@ Board *get_autofilled(Board *b) {
     return temp;
 }
 
-
 #if GUROBI
 
 void freeTemporaryArrays(int *ind, double *val, int ***rowVars, int ***colVars, int ***blockVars, int **cellVars,
                          char *vType, double *solution, int dimension) {
     int i, j;
     free(ind);
+    ind=NULL;
     free(val);
+    val=NULL;
     free(vType);
+    vType=NULL;
     free(solution);
+    solution=NULL;
+    ping(1234);
     for (i = 0; i < dimension; i++) {
         for (j = 0; j < dimension; j++) {
             free(cellVars[(dimension * i) + j]);
+            cellVars[(dimension * i) + j]=NULL;
             free(rowVars[i][j]);
+            rowVars[i][j]=NULL;
             free(blockVars[i][j]);
+            blockVars[i][j]=NULL;
             free(rowVars[i][j]);
+            rowVars[i][j]=NULL;
         }
         free(rowVars[i]);
+        rowVars[i]=NULL;
         free(blockVars[i]);
+        blockVars[i]=NULL;
         free(rowVars[i]);
+        rowVars[i]=NULL;
     }
+    ping(2345);
     free(rowVars);
+    rowVars=NULL;
     free(colVars);
+    colVars=NULL;
     free(blockVars);
+    blockVars=NULL;
     free(cellVars);
+    cellVars=NULL;
+    ping(5678);
 }
 
-Response *QUIT(GRBmodel *model, GRBenv *env, int error, Board *b, int status,
-               int *ind, double *val, int ***rowVars, int ***colVars, int ***blockVars, int **cellVars, char *vType, double *solution,
+Response *QUIT(GRBmodel *model, GRBenv *env, int error, double* mappedSolution, int status,
+               int *ind, double *val, int ***rowVars, int ***colVars, int ***blockVars, int **cellVars,
+               char *vType, double *solution,
                int dimension) {
     Response *res = (Response *) malloc(sizeof(Response));
-    if (error) {
-        printf("ERROR: %s\n code: %d\n", GRBgeterrormsg(env), error);
-        exit(1);
-    }
     /* Free model */
     GRBfreemodel(model);
 
     /* Free environment */
     GRBfreeenv(env);
 
+    if (error) {
+#if DEBUG
+        printf("ERROR: %s\n code: %d\n", GRBgeterrormsg(env), error);
+#endif
+        res->valid = 0;
+        res->success = 0;
+        return res;
+    }
     /*release temporary arrays used throughout the program*/
+    ping(99);
     freeTemporaryArrays(ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
-    res->solution = b;
+    ping(100);
+    res->solution = mappedSolution;
     res->valid = (status == GRB_OPTIMAL);
     res->success = (status == GRB_OPTIMAL || status == GRB_INF_OR_UNBD);
+    ping(111);
     return res;
 }
 
 #endif
 
-Response *calc(Board *src, enum LPMode mode, double threshold) {
+Response *calc(Board *src, enum LPMode mode) {
 #if GUROBI
     GRBenv *env = NULL;
     GRBmodel *model = NULL;
@@ -108,17 +138,13 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
     int **cellVars; /* indices of variables, indexed by cell */
 #if GUROBI
     char *vType; /* should be of size dimension*dimension*dimension */
-    double *solution;
+    double *solution; /* will contain the assignments made to each variable */
+    double *mappedSolution; /* will contain the assignments made to each variable, indexed as [row][col][val] */
     int optimStatus = -1;
     double objVal;
 #endif
-#if DEBUG
-    char errorBuff[300];
-#endif
-
     int dimension, blockWidth, blockHeight;
     int i, j, v, blockIndex, indexInBlock, varCount, valueIsValid;
-    int temp;
     int varConstraintIndex; /* the index of the currently processed variable within the currently constructed constraint*/
 #if GUROBI
     int error = 0;
@@ -135,10 +161,10 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
     rowVars = init_malloc(sizeof(int *), dimension, INT_POINTER);
     colVars = init_malloc(sizeof(int *), dimension, INT_POINTER);
     blockVars = init_malloc(sizeof(int *), dimension, INT_POINTER);
-
 #if GUROBI
     vType = malloc(sizeof(char) * (dimension * dimension * dimension));
     solution = malloc(sizeof(double) * (dimension * dimension * dimension));
+    mappedSolution = malloc(sizeof(double) * (dimension * dimension * dimension));
 #endif
 
     /* Create an empty model */
@@ -147,7 +173,7 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
         for (j = 0; j < dimension; j++) {
             /*each cell in the cellVars array contains an array of variables, one for each possible value*/
             cellVars[i * dimension + j] = init_malloc(sizeof(int), dimension, INT);
-            blockIndex = (int) (dimension / blockWidth) * (int) (j / blockHeight) + (int) (i / blockWidth);
+            blockIndex = (int) floorToInt((double)dimension / blockWidth) * (int) floorToInt((double)j / blockHeight) + (int) (i / blockWidth);
             indexInBlock = blockWidth * (j % blockHeight) + (i % blockWidth);
             for (v = 0; v < dimension; v++) {
                 /*----------------ALLOCATION OF ARRAYS ON DEMAND------------------*/
@@ -186,6 +212,7 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
             }
         }
     }
+
 #if GUROBI
     for (i = 0; i < varCount; i++) {
         if(mode == BinaryVars){
@@ -195,38 +222,38 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
             vType[i] = GRB_CONTINUOUS;
         }
     }
+
     /* Create environment */
     error = GRBloadenv(&env, "sudoku.log");
     if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
-    }
-
-    error = GRBsetintparam(env, "Presolve", 0);
-    if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
 
     /* Create new model */
     error = GRBnewmodel(env, &model, "sudoku", varCount, NULL, NULL, NULL, vType, NULL);
     if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
+
 #endif
     /*-----------CONSTRAINTS-----------*/
     /* for the LP case add constraints to each variable, limiting it to a 0 to 1 range */
     if(mode == ContinuousVars){
         val[0] = 1.0;
         for(i = 0; i<varCount; i++){
+#if GUROBI
             error = GRBaddconstr(model, 1, &i, val, GRB_LESS_EQUAL, 1.0, NULL);
             if (error) {
-                return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+                return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
             }
             error = GRBaddconstr(model, 1, &i, val, GRB_GREATER_EQUAL, 0.0, NULL);
             if (error) {
-                return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+                return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
             }
+#endif
         }
     }
+
     /* limit cells to one value */
     /* iterate over rows */
     for (i = 0; i < dimension; i++) {
@@ -241,20 +268,20 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
                     varConstraintIndex++;
                 }
             }
-            for(temp=0; temp<dimension; temp++){
-                printf("%d, ", ind[temp]);
-            }
-            printf("\n");
-            printf("Set %d constraints for cell %d, %d\n", varConstraintIndex, i, j);
 #if GUROBI
-            varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);
-            error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
-            if (error) {
-                return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+            if(varConstraintIndex>0) {
+                /*varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);*/
+                error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
+                if (error) {
+                    return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars,
+                                cellVars, vType, solution, dimension);
+                }
             }
 #endif
         }
     }
+
+#if !SUPPRESS
     /* limit each value to one appearance per row */
     /* iterate over rows */
     for (i = 0; i < dimension; i++) {
@@ -269,22 +296,19 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
                     varConstraintIndex++;
                 }
             }
-            for(temp=0; temp<varConstraintIndex; temp++){
-                printf("%d, ", ind[temp]);
-            }
-            printf("\n");
-            printf("Set %d constraints for value %d in row %d\n", varConstraintIndex, v, i);
 #if GUROBI
-            varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);
-            error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
-            if (error) {
-                return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+            if(varConstraintIndex>0) {
+                /*varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);*/
+                error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
+                if (error) {
+                    return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars,
+                                cellVars, vType, solution, dimension);
+                }
             }
 #endif
         }
     }
 
-#if 0
     /* limit each value to one appearance per col */
     /* iterate over columns */
     for (j = 0; j < dimension; j++) {
@@ -300,15 +324,19 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
                 }
             }
 #if GUROBI
-            varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);
-            error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
-            if (error) {
-                return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+            /*varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);*/
+            if(varConstraintIndex>0) {
+                error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
+                if (error) {
+                    return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars,
+                                cellVars, vType, solution, dimension);
+                }
             }
 #endif
         }
     }
 
+#endif
     /* limit each value to one appearance per block */
     /* iterate over blocks */
     for (blockIndex = 0; blockIndex < dimension; blockIndex++) {
@@ -317,105 +345,221 @@ Response *calc(Board *src, enum LPMode mode, double threshold) {
             varConstraintIndex = 0;
             /* iterate over cells within block */
             for (indexInBlock = 0; indexInBlock < dimension; indexInBlock++) {
-                i = (blockWidth * (blockIndex % (dimension / blockWidth))) + (indexInBlock % blockWidth);
-                j = (blockHeight * (blockIndex / (dimension / blockWidth))) + (indexInBlock / blockWidth);
-                if (blockVars[j][v][i] != -1) {
-                    ind[varConstraintIndex] = blockVars[j][v][i];
+                if (blockVars[blockIndex][v][indexInBlock] != -1) {
+                    ind[varConstraintIndex] = blockVars[blockIndex][v][indexInBlock];
                     val[varConstraintIndex] = 1.0;
                     varConstraintIndex++;
                 }
             }
 #if GUROBI
-            varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);
-            error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
-            if (error) {
-                return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+            /*varConstraintIndex = (varConstraintIndex - 1) < 0 ? 0 : (varConstraintIndex - 1);*/
+            if(varConstraintIndex>0) {
+                error = GRBaddconstr(model, varConstraintIndex, ind, val, GRB_EQUAL, 1.0, NULL);
+                if (error) {
+                    return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars,
+                                cellVars, vType, solution, dimension);
+                }
             }
 #endif
         }
     }
-#endif
+
 #if GUROBI
     /* Optimize model */
     error = GRBoptimize(model);
     if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
 
+
+    ping(30203);
     /* Write model to 'sudoku.lp' */
     error = GRBwrite(model, "sudoku.lp");
     if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
 
+    ping(789);
     /* Capture solution information */
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimStatus);
-    if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+    if (error || optimStatus==GRB_INF_OR_UNBD) {
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
 
-    error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objVal);
-    if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
-    }
 
+    ping(987);
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, varCount, solution);
     if (error) {
-        return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+        return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
     }
 
-#if DEBUG
-    printf("variables addignments: \n");
-
-    for (i = 0; i < varCount; i++)
-        printf("%d ", (int) solution[i]);
-
-    printf("\n\n");
-#endif
+    ping(1000);
     /* iterate over rows */
     for (i = 0; i < dimension; i++) {
         /* iterate over columns */
         for (j = 0; j < dimension; j++) {
             /* iterate over values */
-            temp = 0;
-#if DEBUG
-            errorBuff[0]='\0';
-#endif
             for (v = 0; v < dimension; v++) {
-                if (cellVars[(i * dimension) + j][v] != -1) {
-                    if(mode == BinaryVars){
-                        if((int) solution[cellVars[(i * dimension) + j][v]]){
-                            b->arr[i][j] = v+1;
-#if DEBUG
-                            sprintf(errorBuff, "%s | cell %d %d got val %d, meaning var %d is 1\n", errorBuff, i, j, v, cellVars[(i * dimension) + j][v]);
-#endif
-                            temp++;
-                        }
-                    }
-                    if(mode == ContinuousVars){
-                        if(solution[cellVars[(i * dimension) + j][v]]>=threshold){
-                            b->arr[i][j] = v+1;
-#if DEBUG
-                            sprintf(errorBuff, "%s | cell %d %d got val %d, meaning var %d is 1\n", errorBuff, i, j, v, cellVars[(i * dimension) + j][v]);
-#endif
-                            temp++;
-                        }
-                    }
+                if (cellVars[(i * dimension) + j][v] != -1){
+                    mappedSolution[(i * dimension * dimension) + (j * dimension) + v] = solution[cellVars[(i * dimension) + j][v]];
                 }
-            }
-#if DEBUG
-            if(temp>1)
-                printf("%s\n", errorBuff);
-#endif
-            if(temp<1){
-                optimStatus = GRB_INF_OR_UNBD;
+                else{
+                    mappedSolution[(i * dimension * dimension) + (j * dimension) + v] = -1;
+                }
             }
         }
     }
-    print_board(b);
-    return QUIT(model, env, error, b, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
+
+    ping(2000);
+    return QUIT(model, env, error, mappedSolution, optimStatus, ind, val, rowVars, colVars, blockVars, cellVars, vType, solution, dimension);
 #endif
 #if !GUROBI
     return NULL;
 #endif
+}
+
+
+int validateLP(Board *b){
+    Response *res;
+    res = calc(b, BinaryVars);
+    if(res->solution)
+        free(res->solution);
+    free(res);
+    return res->valid;
+}
+
+void guessLP(Board *b, double threshold){
+    Response *res;
+    double *solution;
+    int i, j, v, dimension;
+    res = calc(b, ContinuousVars);
+    if(!res->valid){
+        printf(NON_FEASIBLE);
+        if(res->solution)
+            free(res->solution);
+        free(res);
+        return;
+    }
+    dimension = b->dimension;
+    solution = res->solution;
+    /* iterate over rows */
+    for (i = 0; i < dimension; i++) {
+        /* iterate over columns */
+        for (j = 0; j < dimension; j++) {
+            /* iterate over values */
+            for (v = 0; v < dimension; v++) {
+                if (solution[(i * dimension * dimension) + (j * dimension) + v] != -1) {
+                    if(solution[(i * dimension * dimension) + (j * dimension) + v]>=threshold){
+                        b->arr[i][j] = v+1;
+                    }
+                }
+            }
+        }
+    }
+    if(res->solution)
+        free(res->solution);
+    free(res);
+}
+
+void generateLP(Board *b, int **resArr, int *valid){
+    Response *res;
+    double *solution;
+    int i, j, v, dimension;
+    ping(0);
+    res = calc(b, BinaryVars);
+    if(!res)
+        return;
+    if(!res->valid){
+        *valid = 0;
+        free(res->solution);
+        free(res);
+        return;
+    }
+    ping(1);
+    dimension = b->dimension;
+    solution = res->solution;
+    /* iterate over rows */
+    for (i = 0; i < dimension; i++) {
+        /* iterate over columns */
+        for (j = 0; j < dimension; j++) {
+            /* iterate over values */
+            for (v = 0; v < dimension; v++) {
+                if (solution[(i * dimension * dimension) + (j * dimension) + v] != -1) {
+                    if((int)solution[(i * dimension * dimension) + (j * dimension) + v]){
+                        resArr[i][j] = v+1;
+                    }
+                }
+                else{
+                    resArr[i][j] = b->arr[i][j];
+                }
+            }
+        }
+    }
+    ping(2);
+    if(res->solution)
+        free(res->solution);
+    ping(3);
+    if(res != NULL)
+        free(res);
+    ping(4);
+}
+
+int hintLP(Board *b, int x, int y){
+    Response *res;
+    double *solution;
+    int v, dimension, hint;
+    hint = 0;
+    ping(42);
+    res = calc(b, BinaryVars);
+    if(!res){
+        return 0;
+    }
+    ping(6174);
+    if(!res->valid){
+        printf(NON_FEASIBLE);
+        if(res->solution)
+            free(res->solution);
+        free(res);
+        return 0;
+    }
+    dimension = b->dimension;
+    solution = res->solution;
+    /* iterate over rows */
+    for (v = 0; v < dimension; v++) {
+        if (solution[(x * dimension * dimension) + (y * dimension) + v] != -1) {
+            if((int)(solution[(x * dimension * dimension) + (y * dimension) + v])){
+                hint = v+1;
+            }
+        }
+    }
+    ping(89);
+    if(res->solution)
+        free(res->solution);
+    free(res);
+    return hint;
+}
+
+void guessHintLP(Board *b, int x, int y){
+    Response *res;
+    double *solution;
+    int v, dimension;
+    res = calc(b, BinaryVars);
+    if(!res->valid){
+        printf(NON_FEASIBLE);
+        if(res->solution)
+            free(res->solution);
+        free(res);
+        return;
+    }
+    dimension = b->dimension;
+    solution = res->solution;
+    /* iterate over rows */
+    for (v = 0; v < dimension; v++) {
+        if (solution[(x * dimension * dimension) + (y * dimension) + v] > 0) {
+            printf("cell [%d, %d] has value %d with certainty %f\n", x+1, y+1, v+1, solution[(x * dimension * dimension) + (y * dimension) + v]);
+        }
+    }
+    if(res->solution)
+        free(res->solution);
+    free(res);
 }

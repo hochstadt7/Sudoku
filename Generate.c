@@ -5,6 +5,7 @@
 #include "ValidBoard.h"
 #include "ILP.h"
 
+/*the generate module contains functions used by the generate command*/
 /*check whether there are x empty cells*/
 int there_are_x_empty(int **arr, int dimension, int x) {
     int count_empty = 0, row, col;
@@ -84,11 +85,12 @@ int keep_y_cells(Board *b, int y) {
     int **arr;
     arr = b->arr;
     dimension = b->dimension;
+    print_board(b);
     while(alreadyUnsetCount<(dimension * dimension) - y){
         random = rand() % (dimension * dimension);
         row = random / dimension;
         col = random % dimension;
-        if(arr[row][col]){
+        if(arr && arr[row][col]){
             arr[row][col] = 0;
             alreadyUnsetCount++;
         }
@@ -101,7 +103,7 @@ void generate(int x, int y, Board *b) {
     int iteration = 0, count_empty, dimension;
     int **arr, **error;
     Board *temp;
-    Response *res;
+    int res;
 
     arr = b->arr;
     error = b->error;
@@ -116,25 +118,24 @@ void generate(int x, int y, Board *b) {
         printf("There aren't x empty cells.\n");
         return;
     }
-    temp = duplicateBoard(b);
     while (iteration < 1000) {
+        temp = duplicateBoard(b);
         copy_arrays(arr, temp->arr, dimension);/*the original array should remain unaltered until the process succeeds*/
         if (!fill_x_cells(temp, x)) {/*failure in allocation/no legal value for some cells*/
             return;
         }
-        res = calc(temp, BinaryVars, 1);
-        if (!res || !res->valid) {
+        generateLP(temp, temp->arr, &res);
+        if (!res) {
+            destroy_board(temp);
             iteration++;
             continue;
         }
-        destroy_board(temp);
-        temp = duplicateBoard(res->solution);
         if (!keep_y_cells(temp, y))/*failure in allocation*/
             return;
+        copy_arrays(temp->arr, b->arr, dimension);
         add(temp);
         destroy_board(temp);
-        destroy_board(res->solution);
-        free(res);
+        print_board(b);
         return;
     }
     printf("Generation failed.\n");

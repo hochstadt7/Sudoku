@@ -6,11 +6,13 @@
 #include "ValidBoard.h"
 #include "MainAux.h"
 #include "ILP.h"
+/*the game module contains all the main functions used to manipulate the board, with the exceptions of a few exceptions
+ *which are distributed in designated files, mainly due to thematic similarity*/
 /*give a hint to a value in a specified square*/
 void hint(int x, int y, Board *b) {
     int **arr, **fixed, **error;
     int dimension;
-    Response* res;
+    int res;
     dimension = b->dimension;
     arr = b->arr;
     fixed = b->fixed;
@@ -27,12 +29,10 @@ void hint(int x, int y, Board *b) {
         printf("Can't give a hint to a full cell.\n");
         return;
     }
-    res = calc(b, BinaryVars, 1);
-    if(res->valid)
-        printf("Hint: set %d, %d to %d\n", x, y, res->solution->arr[x][y]);
+    res = hintLP(b, x, y);
+    if(res>0)
+        printf("Hint: set %d, %d to %d\n", x, y, res);
     else printf("No valid solution was found\n");
-    destroy_board(res->solution);
-    free(res);
 }
 /*save the board in a new file in the specified link*/
 void save(char *link, Board *board) {
@@ -58,7 +58,6 @@ void save(char *link, Board *board) {
         }
     }
         fprintf(dest, "%d %d\n", board->row_per_block, board->col_per_block);
-
         for (index_row = 0; index_row < board->dimension; index_row++) {
 
             for (index_col = 0; index_col < board->dimension-1; index_col++) {
@@ -117,11 +116,13 @@ void set(int x, int y, int z, Board *b) {
     }
 
     /*TODO: change condition here, error value is ok*/
-    if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {
+    /*if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {*/
+    if (1) {
         arr[x][y] = z;
         add(b);
         fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block, col_per_block);
     }
+    print_board(b);
 }
 
 void guess(float threshold, Board *b){
@@ -134,6 +135,8 @@ void guess(float threshold, Board *b){
         printf("Guess can't be executed because board is erroneous.\n");
         return;;
     }
+    guessLP(b, threshold);
+    print_board(b);
     printf("%f",threshold);
 }
 
@@ -180,6 +183,7 @@ Board* edit(char *link, Board *old) {
         /*check_fixed_cells_validity(new->arr,new->fixed,new->solution,new->error,new->dimension,new->row_per_block,new->col_per_block);*/
     }
     add(new);
+    print_board(new);
     return new;
 }
 
@@ -192,6 +196,7 @@ Board* solve(char *link, Board *old) {
         check_fixed_cells_validity(new);
     }
     add(new);
+    print_board(new);
     return new;
 }
 
@@ -202,7 +207,7 @@ void setMarkErrors(int mark_errors, Board *b) {
 void validate(Board *b){
     int **error;
     int dimension;
-    Response* res;
+    int res;
     dimension = b->dimension;
     error = b->error;
     if(is_erroneous(error,dimension))
@@ -210,10 +215,8 @@ void validate(Board *b){
         printf("Validation can't be executed because board is erroneous.\n");
         return;;
     }
-    res = calc(b, BinaryVars, 1);
-    if(res->valid)
+    res = validateLP(b);
+    if(res)
         printf("The board is solvable\n");
     else printf("No valid solution was found\n");
-    destroy_board(res->solution);
-    free(res);
 }

@@ -1,7 +1,9 @@
 #ifndef BIGPROJECT_MAINAUX_H
 #define BIGPROJECT_MAINAUX_H
+#define DEBUG 1
 
 enum variableType {INT=1, INT_POINTER=2, DOUBLE=3};
+int ping(int p);
 int** first_init(int dimension);/*initialize board*/
 int** duplicateArray(int **arr, int dimension);
 void copy_arrays(int **copy, int**paste,int dimension);/*copy data of copy to paste*/

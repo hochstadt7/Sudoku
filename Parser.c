@@ -121,7 +121,10 @@ void get_next_command(enum gameMode mode, struct Command* currMove){
             currMove->bool_param = boolParam;
         }
         if(paramType == PARAM_STR){
-            currMove->str_param = param;
+            if(param)
+                currMove->str_param = param;
+            else
+                currMove->str_param = "";
         }
     }
     /*if some of the required params are missing - print an error message*/

@@ -3,7 +3,8 @@
 #include "Board.h"
 #include "MainAux.h"
 
-
+/*the board module contains the board struct, which is at the heart of the program
+ *it also contains basic functions that can be used to manipulate the board, and don't require advanced computation*/
 List *create_list() {
     List *tmp = (List *) malloc(sizeof(List));
     if(tmp==NULL){
@@ -69,8 +70,6 @@ void reset_list(Board* b){
     lst = b->lst;
     if(lst->head==NULL)
         return;
-    while (lst->curr->next!=NULL)
-        lst->curr=lst->curr->next;
     while (lst->curr->prev!=NULL)
     {
         lst->curr=lst->curr->prev;
@@ -179,6 +178,7 @@ void undo(Board* b){
     }
     lst->curr = lst->curr->prev;
     copy_arrays(lst->curr->arr, arr, b->dimension);
+    print_board(b);
 }
 /*redo move*/
 void redo(Board* b) {
@@ -193,6 +193,7 @@ void redo(Board* b) {
     }
     lst->curr = lst->curr->next;
     copy_arrays(lst->curr->arr, arr, b->dimension);
+    print_board(b);
 }
 Board* duplicateBoard(Board* b){
     int dimension, row_per_block, col_per_block, i, j;

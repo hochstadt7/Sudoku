@@ -1,6 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "MainAux.h"
+
+/*the main-aux module contains useful lightweight functions that have frequent usage throughout the program*/
+/*ping function used for debugging*/
+
+int ping(int p){
+#if DEBUG
+    printf("ping %d\n", p);
+#endif
+    return p;
+}
+
 /*initialize the array*/
 int** first_init(int dimension) {
     int i,j;

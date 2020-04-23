@@ -4,23 +4,12 @@
 #include "Parser.h"
 #include "Game.h"
 #include "Autofill.h"
-#include "ILP.h"
+#include "MainAux.h"
 #include "Generate.h"
 #include "Solve.h"
 
-void print_me(int **arr,int dimension)
-{
-    int index_row,index_col;
-    for(index_row=0; index_row<dimension; index_row++){
-        for(index_col=0; index_col<dimension; index_col++)
-        {
-            printf("%d ",arr[index_row][index_col]);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-}
-
+/* the main module contains the the game loop - it repeatedly asks the user for input
+ * via the parser module, and executes it*/
 int main() {
     Board *game = create_board(1, 1, 1);
     struct Command currCommandObj = {
@@ -43,7 +32,7 @@ int main() {
         }
         switch (commandType) {
             case SOLVE:
-                solve(str, game);
+                game=solve(str, game);
                 break;
             case EDIT:
                 game=edit(str, game);
@@ -88,7 +77,7 @@ int main() {
                 autofill(game);
                 break;
             case RESET:
-                calc(game, BinaryVars, 1);
+                reset_list(game);
                 break;
             case EXIT:
                 exit_game(game);
@@ -98,7 +87,18 @@ int main() {
             default:
                 break;
         }
-        print_board(game);
+        if(game->mode == SolveMode && !there_are_x_empty(game->arr, game->dimension, 1)){
+            print_board(game);
+            if(is_erroneous(game->error,game->dimension))
+            {
+                printf("The solutions contains errors.\n");
+            }
+            if(!is_erroneous(game->error,game->dimension))
+            {
+                printf("Puzzle completed successfully.\n");
+                game->mode=InitMode;
+            }
+        }
     }
     return 0;
 }
