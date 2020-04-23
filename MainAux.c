@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include "MainAux.h"
 
-/*the main-aux module contains useful lightweight functions that have frequent usage throughout the program*/
-/*ping function used for debugging*/
 
+/*ping function used for debugging*/
 int ping(int p){
 #if DEBUG
     printf("ping %d\n", p);

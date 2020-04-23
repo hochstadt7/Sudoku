@@ -12,7 +12,6 @@
 #if GUROBI
 
 #include "gurobi_c.h"
-
 #endif
 
 int floorToInt(double x) {

@@ -1,6 +1,6 @@
 #ifndef BIGPROJECT_STACK_H
 #define BIGPROJECT_STACK_H
-
+/*the stack module implements a stack data structure, which is used to simulate recursion for the numsolutions command*/
 /*holder of move*/
 typedef struct move{
     int row,col,val;

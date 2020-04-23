@@ -3,8 +3,6 @@
 #include "Board.h"
 #include "MainAux.h"
 
-/*the board module contains the board struct, which is at the heart of the program
- *it also contains basic functions that can be used to manipulate the board, and don't require advanced computation*/
 List *create_list() {
     List *tmp = (List *) malloc(sizeof(List));
     if(tmp==NULL){

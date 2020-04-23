@@ -2,7 +2,6 @@
 #include "Board.h"
 #include "ValidBoard.h"
 #include "MainAux.h"
-/*the autofill module contains a single function, whose purpose is to fill board cells that only have one possible valid value*/
 void autofill(Board *b) {
     int **arr, **error;
     int dimension, row_per_block, col_per_block;

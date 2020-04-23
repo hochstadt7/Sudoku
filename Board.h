@@ -1,21 +1,26 @@
 #ifndef BIGPROJECT_BOARD_H
 #define BIGPROJECT_BOARD_H
 
+
+/*the board module contains the board struct, which is at the heart of the program
+ *it also contains basic functions that can be used to manipulate the board, and don't require advanced computation*/
+
 /*status of game*/
 enum gameMode {InitMode=1, SolveMode=2, EditMode=3};
 
+/*struct containing a state of the board from the game history (for undo/redo purposes)*/
 typedef struct node{
     int **arr;
     struct node* next;
     struct node* prev;
 }Node;
 
-/*holder of moves's timeline*/
+/*holder of moves timeline (undo/redo change the head position)*/
 typedef struct linked_list{
     Node *curr,*head;
 }List;
 
-/*board game*/
+/*board - contains all relevant information about the state of the game*/
 typedef struct board{
     int **arr, **fixed,**error;
     int dimension, row_per_block,col_per_block,mark_errors;

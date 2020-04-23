@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "Stack.h"
 
+/*the solve module contains the implementation of the stack-based exhaustive backtracking algorithm*/
 Move *create_move(int row,int col,int value){
 Move *temp=(Move*)malloc(sizeof(Move));
 if(!temp) {
