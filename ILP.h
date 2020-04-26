@@ -9,8 +9,6 @@ enum LPMode {BinaryVars=1, ContinuousVars=2};
 /*this struct is used to pass data about the result of the linear program back to the interface functions*/
 typedef struct response{
     double * solution; /* some valid assignment if one was found */
-    int ** cellMap;
-    int success; /* 1 if some error occurred */
     int valid; /* 1 if a feasible solution was found */
 }Response;
 void guessHintLP(Board *b, int x, int y);/*used for the guesshint action*/

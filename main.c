@@ -18,6 +18,8 @@ int main() {
     struct Command *currCommand = &currCommandObj;
     int commandType;
     char str[MAX_COMMAND_LENGTH];
+    setbuf(stdout, 0);
+    fflush(stdout);
     /* run the game */
     printf("Welcome, we hope you enjoy our sudoku game. Please input a command\n");
     while (1) {

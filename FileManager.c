@@ -24,7 +24,7 @@ int fixed_are_valid(int **arr,int **fixed,int dimension,int row_per_block,int co
             }
         }
     }
-    free_arrays(temp,dimension);
+    free_arrays(temp, dimension);
     return 1;
 }
 

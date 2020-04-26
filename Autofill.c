@@ -31,6 +31,9 @@ void autofill(Board *b) {
                     temp->arr[row][col] = candidate;
                 }
             }
+            else{
+                temp->arr[row][col] = arr[row][col];
+            }
         }
     }
     copy_arrays(temp->arr, arr, dimension);

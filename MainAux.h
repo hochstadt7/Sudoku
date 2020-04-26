@@ -1,6 +1,14 @@
 #ifndef BIGPROJECT_MAINAUX_H
 #define BIGPROJECT_MAINAUX_H
 #define DEBUG 0
+
+
+#if DEBUG
+# define DEBUG_PRINT(x) printf x
+#else
+# define DEBUG_PRINT(x) do {} while (0)
+#endif
+
 /*the main-aux module contains useful lightweight functions that have frequent usage throughout the program*/
 
 enum variableType {INT=1, INT_POINTER=2, DOUBLE=3}; /*possible variable types, used to initialize arrays with default values*/

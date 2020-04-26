@@ -126,24 +126,30 @@ void print_board(Board* b){
     for (index_row = 0; index_row < dimension; index_row++) {
         if (index_row % row_per_block == 0) {
             for(index_block=0; index_block<num_dash; index_block++) {
-                printf("-");
+                printf("-"); /* block separators */
             }
             printf("\n");
         }
         for (index_block = 0; index_block < blocks_per_row; index_block++) {
-            printf("|");
+            printf("|"); /* block separators */
             for (index_col = 0; index_col < col_per_block; index_col++) {
                 if (arr[index_row][index_col + col_per_block * index_block] != 0) {
-
-                    if (fixed[index_row][index_col + col_per_block * index_block] != 0)/*fixed cell*/
+                    /* filled cells*/
+                    if (fixed[index_row][index_col + col_per_block * index_block] != 0){
+                        /*fixed cells*/
                         printf(" %2d.", arr[index_row][index_col + col_per_block * index_block]);
-                    else if(error[index_row][index_col + col_per_block * index_block] != 0 && mark_errors){
+                    }
+                    else if(error[index_row][index_col + col_per_block * index_block] != 0 && (b->mode == EditMode || mark_errors)){
+                        /*cells involved in errors*/
                         printf(" %2d*", arr[index_row][index_col + col_per_block * index_block]);
                     }
-                    else
+                    else{
+                        /* 'regular' cells' */
                         printf(" %2d ", arr[index_row][index_col + col_per_block * index_block]);
+                    }
                 } else {
-                    printf("    ");
+                    /* empty cells */
+                    printf("    "); /*empty cell*/
                 }
             }
         }
@@ -164,8 +170,8 @@ Board* duplicateBoard(Board* b){
     row_per_block = b->row_per_block;
     col_per_block = b->col_per_block;
     new = create_board(dimension, row_per_block, col_per_block);
-    for(i=0; i<row_per_block; i++){
-        for(j=0; j<col_per_block; j++){
+    for(i=0; i<dimension; i++){
+        for(j=0; j<dimension; j++){
             new->arr[i][j] = b->arr[i][j];
         }
     }

@@ -67,49 +67,6 @@ void guesshint(int x, int y, Board *b) {
     }
     guessHintLP(b, x, y);
 }
-/*save the board in a new file in the specified link*/
-void save(char *link, Board *board) {
-    int index_row, index_col;
-    FILE *dest = NULL;
-    /*check if board is erroneous, andin edit mode or not solvable (need to add not solvable condition after implemnting ilp)*/
-    if (board->mode == EditMode && is_erroneous(board->error, board->dimension)) {
-        printf("erroneous boards may not be saved in 'edit' mode.\n");
-        return;
-    }
-    dest = fopen(link, "w");
-    if (dest == NULL) {
-        printf("Invalid filepath.\n");
-        exit(0);
-    }
-    if (board->mode == EditMode) {/* in such a case all filled cells are fixed*/
-        for (index_row = 0; index_row < board->dimension; index_row++) {
-            for (index_col = 0; index_col < board->dimension; index_col++) {
-                if (board->arr[index_row][index_col] != 0) {
-                    board->fixed[index_row][index_col] = 1;
-                }
-            }
-        }
-    }
-        fprintf(dest, "%d %d\n", board->row_per_block, board->col_per_block);
-        for (index_row = 0; index_row < board->dimension; index_row++) {
-
-            for (index_col = 0; index_col < board->dimension-1; index_col++) {
-                if (board->fixed[index_row][index_col] != 1) {
-                    fprintf(dest, "%d ", board->arr[index_row][index_col]);
-                } else {
-                    fprintf(dest, "%d. ", board->arr[index_row][index_col]);
-                }
-
-            }
-            if (board->fixed[index_row][board->dimension-1] != 1) {
-                fprintf(dest, "%d", board->arr[index_row][board->dimension-1]);
-            } else {
-                fprintf(dest, "%d.", board->arr[index_row][board->dimension-1]);
-            }
-            fprintf(dest, "\n");/*validate it is nessecery last iteration*/
-        }
-        fclose(dest);
-}
 
 /* set block to input value if value is legal */
 void set(int x, int y, int z, Board *b) {
@@ -148,13 +105,10 @@ void set(int x, int y, int z, Board *b) {
         return;
     }
 
-    /*TODO: change condition here, error value is ok*/
-    /*if (is_valid(arr, dimension, x, y, z, row_per_block, col_per_block)) {*/
-    if (1) {
-        arr[x][y] = z;
-        add(b);
-        fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block, col_per_block);
-    }
+    arr[x][y] = z;
+    add(b);
+    fix_error(arr, error, dimension, x, y, z, x - x % row_per_block, y - y % col_per_block, row_per_block, col_per_block);
+
     print_board(b);
 }
 
@@ -169,6 +123,7 @@ void guess(float threshold, Board *b){
         return;;
     }
     guessLP(b, threshold);
+    add(b);
     print_board(b);
 }
 
@@ -211,12 +166,11 @@ Board* edit(char *link, Board *old) {
         /*if edit didnt fail, free current board memory "forget him"*/
         new->mode=EditMode;
         destroy_board(old);
-        /*not sure that this call should exist in edit mode*/
-        /*check_fixed_cells_validity(new->arr,new->fixed,new->solution,new->error,new->dimension,new->row_per_block,new->col_per_block);*/
+        add(new);
+        print_board(new);
+        return new;
     }
-    add(new);
-    print_board(new);
-    return new;
+    return old;
 }
 
 Board* solve(char *link, Board *old) {
@@ -226,17 +180,18 @@ Board* solve(char *link, Board *old) {
         new->mode=SolveMode;
         destroy_board(old);
         check_fixed_cells_validity(new);
+        add(new);
+        print_board(new);
+        return new;
     }
-    add(new);
-    print_board(new);
-    return new;
+    return old;
 }
 
 void setMarkErrors(int mark_errors, Board *b) {
     b->mark_errors=mark_errors;
 }
 
-void validate(Board *b){
+int validate(Board *b){
     int **error;
     int dimension;
     int res;
@@ -245,12 +200,17 @@ void validate(Board *b){
     if(is_erroneous(error,dimension))
     {
         printf("Validation can't be executed because board is erroneous.\n");
-        return;;
+        return 0;
     }
     res = validateLP(b);
-    if(res)
+    if(res){
         printf("The board is solvable\n");
-    else printf("No valid solution was found\n");
+        return 1;
+    }
+    else {
+        printf("No valid solution was found\n");
+        return 0;
+    }
 }
 
 
@@ -302,4 +262,40 @@ void reset_list(Board* b){
     copy_arrays(lst->curr->arr, arr, b->dimension);
     reCalcErrors(b);
     print_board(b);
+}
+
+/*save the board in a new file in the specified link*/
+void save(char *link, Board *board) {
+    int index_row, index_col;
+    char suffix;
+    FILE *dest = NULL;
+    /*check if board is erroneous, and in edit mode or not solvable (need to add not solvable condition after implemnting ilp)*/
+    if (board->mode == EditMode && (is_erroneous(board->error, board->dimension) || !validate(board))) {
+        printf("erroneous boards may not be saved in 'edit' mode.\n");
+        return;
+    }
+    printf("Saving...\n");
+    dest = fopen(link, "w");
+    if (dest == NULL) {
+        printf("Invalid filepath.\n");
+        exit(0);
+    }
+    fprintf(dest, "%d %d\n", board->row_per_block, board->col_per_block);
+    for (index_row = 0; index_row < board->dimension; index_row++) {
+        for (index_col = 0; index_col < board->dimension; index_col++) {
+            if(index_col == board->dimension-1){
+                suffix = '\n';
+            }
+            else{
+                suffix = ' ';
+            }
+            if ((board->fixed[index_row][index_col] == 1 || board->mode == EditMode) && board->arr[index_row][index_col]>0) {
+                fprintf(dest, "%d.%c", board->arr[index_row][index_col], suffix);
+            } else {
+                fprintf(dest, "%d%c", board->arr[index_row][index_col], suffix);
+            }
+        }
+    }
+    fclose(dest);
+    printf("Saved board to %s\n", link);
 }
